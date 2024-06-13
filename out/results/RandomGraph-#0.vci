@@ -1,0 +1,31 @@
+file 777 1714148206                                             
+version 3
+run RandomGraph-0-20240426-19:16:29-22831
+attr configname RandomGraph
+attr datetime 20240426-19:16:29
+attr datetimef 20240426-191629
+attr experiment RandomGraph
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network networks.RandomGraph
+attr processid 22831
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network networks.RandomGraph
+config **.destAddresses "\"0 2\""
+config **.appType "\"App\""
+config **.app.packetLength "4096 bytes"
+
+vector 0 RandomGraph.node[2].app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+0	744 32 15 15 0.108033412156 0.108033412156 1 0.000398304 0.000398304 0.000398304 1.58646076416e-07
+

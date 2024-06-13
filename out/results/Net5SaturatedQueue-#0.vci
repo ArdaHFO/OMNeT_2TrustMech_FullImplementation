@@ -1,0 +1,293 @@
+file 11345 1714148077                                           
+version 3
+run Net5SaturatedQueue-0-20240426-19:14:15-22831
+attr configname Net5SaturatedQueue
+attr datetime 20240426-19:14:15
+attr datetimef 20240426-191415
+attr experiment Net5SaturatedQueue
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network networks.Net5
+attr processid 22831
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network networks.Net5
+config sim-time-limit 200s
+config **.frameCapacity 10
+config **.destAddresses "\"1 4\""
+config **.sendIaTime "uniform(100ms, 500ms)"
+config **.app.packetLength "intuniform(50 bytes, 4096 bytes)"
+config **.channel.*.result-recording-modes -vector
+config **.result-recording-modes all
+config **.appType "\"App\""
+config **.app.packetLength "4096 bytes"
+
+vector 0 Net5.rte[0].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 1 Net5.rte[0].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 2 Net5.rte[0].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 3 Net5.rte[0].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 4 Net5.rte[1].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 5 Net5.rte[1].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 6 Net5.rte[1].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 7 Net5.rte[1].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 8 Net5.rte[1].queue[2] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 9 Net5.rte[1].queue[2] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 10 Net5.rte[2].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 11 Net5.rte[2].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 12 Net5.rte[2].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 13 Net5.rte[2].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 14 Net5.rte[2].queue[2] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 15 Net5.rte[2].queue[2] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 16 Net5.rte[2].queue[3] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 17 Net5.rte[2].queue[3] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 18 Net5.rte[3].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 19 Net5.rte[3].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 20 Net5.rte[3].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 21 Net5.rte[3].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 22 Net5.rte[3].queue[2] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 23 Net5.rte[3].queue[2] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 24 Net5.rte[4].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 25 Net5.rte[4].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 26 Net5.rte[4].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 27 Net5.rte[4].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 28 Net5.rte[4].queue[1] txBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "transmitting packet byte length"
+attr unit bytes
+vector 29 Net5.rte[0].queue[1] txBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "transmitting packet byte length"
+attr unit bytes
+vector 30 Net5.rte[2].queue[2] txBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "transmitting packet byte length"
+attr unit bytes
+vector 31 Net5.rte[1].queue[2] txBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "transmitting packet byte length"
+attr unit bytes
+vector 32 Net5.rte[3].queue[0] txBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "transmitting packet byte length"
+attr unit bytes
+vector 33 Net5.rte[2].queue[3] txBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "transmitting packet byte length"
+attr unit bytes
+vector 34 Net5.rte[3].queue[1] txBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "transmitting packet byte length"
+attr unit bytes
+vector 35 Net5.rte[0].queue[0] txBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "transmitting packet byte length"
+attr unit bytes
+vector 36 Net5.rte[2].queue[2] rxBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "received packet byte length"
+attr unit bytes
+vector 37 Net5.rte[2].queue[3] rxBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "received packet byte length"
+attr unit bytes
+vector 38 Net5.rte[4].app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 39 Net5.rte[4].app hopCount:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "hop count of arrived packets"
+vector 40 Net5.rte[4].app sourceAddress:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "source address of arrived packets"
+vector 41 Net5.rte[2].queue[0] rxBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "received packet byte length"
+attr unit bytes
+vector 42 Net5.rte[1].app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 43 Net5.rte[1].app hopCount:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "hop count of arrived packets"
+vector 44 Net5.rte[1].app sourceAddress:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "source address of arrived packets"
+vector 45 Net5.rte[4].queue[1] rxBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "received packet byte length"
+attr unit bytes
+vector 46 Net5.rte[1].queue[2] rxBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "received packet byte length"
+attr unit bytes
+vector 47 Net5.rte[1].queue[0] rxBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "received packet byte length"
+attr unit bytes
+vector 48 Net5.rte[4].queue[0] rxBytes:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "received packet byte length"
+attr unit bytes
+0	8006 8 0 0 0 0 1 0 0 0 0
+1	8014 141 0 103 0 1.387035342234 7 0 1 3 3
+2	8155 8 0 0 0 0 1 0 0 0 0
+3	8163 97 0 132 0 1.619081519106 5 0 1 2 2
+4	8260 8 0 0 0 0 1 0 0 0 0
+5	8268 8 0 0 0 0 1 0 0 0 0
+6	8276 8 0 0 0 0 1 0 0 0 0
+7	8284 8 0 0 0 0 1 0 0 0 0
+8	8292 8 0 0 0 0 1 0 0 0 0
+9	8300 140 0 58 0 0.879145194462 7 0 1 3 3
+10	8440 9 0 0 0 0 1 0 0 0 0
+11	8449 9 0 0 0 0 1 0 0 0 0
+12	8458 9 0 0 0 0 1 0 0 0 0
+13	8467 9 0 0 0 0 1 0 0 0 0
+14	8476 103 0 121 0 1.47881725351 5 0 1 2 2
+15	8579 171 0 135 0 1.628536419291 8 0 1 4 4
+16	8750 197 0 117 0 1.476542280185 9 0 3 12 24
+17	8947 123 0 84 0 1.102764938586 6 0 1 3 3
+18	9070 55 0 72 0 1.057792520501 3 0 1 1 1
+19	9125 32 0 17 0 0.359268750623 2 0 1 1 1
+20	9157 80 0 124 0 1.527020212542 4 0 1 2 2
+21	9237 32 0 28 0 0.516610064823 2 0 1 1 1
+22	9269 9 0 0 0 0 1 0 0 0 0
+23	9278 9 0 0 0 0 1 0 0 0 0
+24	9287 9 0 0 0 0 1 0 0 0 0
+25	9296 9 0 0 0 0 1 0 0 0 0
+26	9305 101 0 60 0 0.938660607641 5 0 1 2 2
+27	9406 100 0 116 0 1.47306307603 5 0 1 2 2
+28	9506 101 3 60 0.108087359648 0.938660607641 4 805 3241 6589 14737491
+29	9607 52 6 120 0.128414423484 1.477395698614 2 1522 3553 5075 14940293
+30	9659 154 9 135 0.134851718787 1.628536419291 6 689 3553 9631 21552275
+31	9813 75 12 46 0.234958464652 0.691007565427 3 689 938 2336 1857246
+32	9888 52 17 72 0.359268750623 1.057792520501 2 3410 4059 7469 28103581
+33	9940 155 24 117 0.419443463907 1.476542280185 6 805 3349 11216 28100174
+34	10095 53 28 112 0.516610064823 1.457248023918 2 1205 3581 4786 14275586
+35	10148 77 35 96 0.619861760642 1.190871389489 3 141 3175 5390 14401982
+36	10225 77 48 113 0.769721946582 1.467560240224 3 805 1691 3348 4233410
+37	10302 76 61 106 0.945213722147 1.447194077772 3 689 938 2336 1857246
+38	10378 120 71 147 1.054822167103 1.703690176652 4 0 1.344421426029 2.338397296974 2.7954570027867
+39	10498 94 71 147 1.054822167103 1.703690176652 4 0 1 2 2
+40	10592 94 71 147 1.054822167103 1.703690176652 4 2 4 13 45
+41	10686 26 73 73 1.061937167153 1.061937167153 1 3553 3553 3553 12623809
+42	10712 193 78 144 1.070060043595 1.693228384854 6 0 1.149252598013 3.913673715254 3.9239768329865
+43	10905 141 78 144 1.070060043595 1.693228384854 6 0 1 4 4
+44	11046 141 78 144 1.070060043595 1.693228384854 6 0 2 6 10
+45	11187 26 85 85 1.128827589732 1.128827589732 1 2058 2058 2058 4235364
+46	11213 51 128 139 1.56869606192 1.64566707299 2 806 2342 3148 6134600
+47	11264 53 136 142 1.635353178139 1.693228384854 2 141 3175 3316 10100506
+48	11317 27 145 145 1.703690176652 1.703690176652 1 3410 3410 3410 11628100
+

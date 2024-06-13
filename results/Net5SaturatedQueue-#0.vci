@@ -1,0 +1,171 @@
+file 4882 1714253754                                            
+version 3
+run Net5SaturatedQueue-0-20240428-00:35:50-32405
+attr configname Net5SaturatedQueue
+attr datetime 20240428-00:35:50
+attr datetimef 20240428-003550
+attr experiment Net5SaturatedQueue
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network networks.Net5
+attr processid 32405
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network networks.Net5
+config sim-time-limit 200s
+config **.frameCapacity 10
+config **.destAddresses "\"1 4\""
+config **.sendIaTime "uniform(100ms, 500ms)"
+config **.app.packetLength "intuniform(50 bytes, 4096 bytes)"
+config **.channel.*.result-recording-modes -vector
+config **.result-recording-modes all
+config **.appType "\"App\""
+config **.app.packetLength "4096 bytes"
+
+vector 0 Net5.rte[0].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 1 Net5.rte[0].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 2 Net5.rte[0].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 3 Net5.rte[0].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 4 Net5.rte[1].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 5 Net5.rte[1].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 6 Net5.rte[1].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 7 Net5.rte[1].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 8 Net5.rte[1].queue[2] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 9 Net5.rte[1].queue[2] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 10 Net5.rte[2].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 11 Net5.rte[2].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 12 Net5.rte[2].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 13 Net5.rte[2].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 14 Net5.rte[2].queue[2] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 15 Net5.rte[2].queue[2] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 16 Net5.rte[2].queue[3] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 17 Net5.rte[2].queue[3] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 18 Net5.rte[3].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 19 Net5.rte[3].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 20 Net5.rte[3].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 21 Net5.rte[3].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 22 Net5.rte[3].queue[2] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 23 Net5.rte[3].queue[2] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 24 Net5.rte[4].queue[0] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 25 Net5.rte[4].queue[0] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+vector 26 Net5.rte[4].queue[1] qlen:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "queue length"
+vector 27 Net5.rte[4].queue[1] busy:vector ETV
+attr interpolationmode sample-hold
+attr recordingmode vector
+attr title "server busy state"
+0	4639 8 0 0 0 0 1 0 0 0 0
+1	4647 8 0 0 0 0 1 0 0 0 0
+2	4655 8 0 0 0 0 1 0 0 0 0
+3	4663 8 0 0 0 0 1 0 0 0 0
+4	4671 8 0 0 0 0 1 0 0 0 0
+5	4679 8 0 0 0 0 1 0 0 0 0
+6	4687 8 0 0 0 0 1 0 0 0 0
+7	4695 8 0 0 0 0 1 0 0 0 0
+8	4703 8 0 0 0 0 1 0 0 0 0
+9	4711 8 0 0 0 0 1 0 0 0 0
+10	4719 9 0 0 0 0 1 0 0 0 0
+11	4728 9 0 0 0 0 1 0 0 0 0
+12	4737 9 0 0 0 0 1 0 0 0 0
+13	4746 9 0 0 0 0 1 0 0 0 0
+14	4755 9 0 0 0 0 1 0 0 0 0
+15	4764 9 0 0 0 0 1 0 0 0 0
+16	4773 9 0 0 0 0 1 0 0 0 0
+17	4782 9 0 0 0 0 1 0 0 0 0
+18	4791 9 0 0 0 0 1 0 0 0 0
+19	4800 9 0 0 0 0 1 0 0 0 0
+20	4809 9 0 0 0 0 1 0 0 0 0
+21	4818 9 0 0 0 0 1 0 0 0 0
+22	4827 9 0 0 0 0 1 0 0 0 0
+23	4836 9 0 0 0 0 1 0 0 0 0
+24	4845 9 0 0 0 0 1 0 0 0 0
+25	4854 9 0 0 0 0 1 0 0 0 0
+26	4863 9 0 0 0 0 1 0 0 0 0
+27	4872 9 0 0 0 0 1 0 0 0 0
+

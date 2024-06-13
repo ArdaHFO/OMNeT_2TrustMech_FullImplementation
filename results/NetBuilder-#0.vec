@@ -1,0 +1,116 @@
+version 3
+run NetBuilder-0-20240603-06:14:00-51227
+attr configname NetBuilder
+attr datetime 20240603-06:14:00
+attr datetimef 20240603-061400
+attr experiment NetBuilder
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network networks.Dynamic
+attr processid 51227
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network networks.Dynamic
+config **.address "int(replace(fullName(), \"Node:\", \"\"))"
+config **.destAddresses "\"1 50\""
+config **.appType "\"App\""
+config **.app.packetLength "4096 bytes"
+
+vector 0 Dynamic.Node:1.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 1 Dynamic.Node:17.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 2 Dynamic.Node:2.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 3 Dynamic.Node:15.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 4 Dynamic.Node:20.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 5 Dynamic.Node:4.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 6 Dynamic.Node:44.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 7 Dynamic.Node:26.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 8 Dynamic.Node:35.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 9 Dynamic.Node:45.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 10 Dynamic.Node:18.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 11 Dynamic.Node:29.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 12 Dynamic.Node:14.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 13 Dynamic.Node:3.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 14 Dynamic.Node:42.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+0	106	0.382482409438	0.256608
+1	116	0.411322160633	0.299376
+2	123	0.433305026124	0.342144
+3	168	0.627600848005	0.299376
+4	171	0.630320137255	0.171072
+5	244	0.99157242119	0.256608
+6	260	1.008357036043	0.171072
+7	314	1.171697195042	0.299376
+8	323	1.212995122755	0.21384
+9	326	1.218166935516	0.256608
+10	370	1.634088258637	0.128304
+11	418	1.842687639589	0.171072
+12	424	1.861847557062	0.256608
+12	471	2.16706863212	0.21384
+13	506	2.297500215912	0.256608
+14	533	2.399140866827	0.171072
+

@@ -1,0 +1,32 @@
+file 1019 1714158453                                            
+version 3
+run NetBuilder-0-20240426-22:07:06-31724
+attr configname NetBuilder
+attr datetime 20240426-22:07:06
+attr datetimef 20240426-220706
+attr experiment NetBuilder
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network networks.RandomGraph
+attr processid 31724
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network networks.RandomGraph
+config **.address "int(replace(fullName(), \"rte\", \"\"))"
+config **.destAddresses "\"1 50\""
+config **.appType "\"App\""
+config **.app.packetLength "4096 bytes"
+
+vector 0 RandomGraph.node[1].app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+0	802 216 23 139 0.382687426004 1.247159167206 7 0 0.00066384 0.002788128 1.392560004096e-06
+

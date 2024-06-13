@@ -1,0 +1,21 @@
+digraph "Packet"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="Packet",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Class generated from node/Packet.msg:15 by opp_msgtool."];
+  Node2 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="omnetpp::cPacket",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="/home/asus/Downloads/omnetpp-6.0/doc/api/opptags.xml$classomnetpp_1_1cPacket.html",tooltip=" "];
+  Node3 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="omnetpp::cMessage",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="/home/asus/Downloads/omnetpp-6.0/doc/api/opptags.xml$classomnetpp_1_1cMessage.html",tooltip=" "];
+  Node4 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="omnetpp::cEvent",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="/home/asus/Downloads/omnetpp-6.0/doc/api/opptags.xml$classomnetpp_1_1cEvent.html",tooltip=" "];
+  Node5 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="omnetpp::cOwnedObject",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="/home/asus/Downloads/omnetpp-6.0/doc/api/opptags.xml$classomnetpp_1_1cOwnedObject.html",tooltip=" "];
+  Node6 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="omnetpp::cNamedObject",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="/home/asus/Downloads/omnetpp-6.0/doc/api/opptags.xml$classomnetpp_1_1cNamedObject.html",tooltip=" "];
+  Node7 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="omnetpp::cObject",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="/home/asus/Downloads/omnetpp-6.0/doc/api/opptags.xml$classomnetpp_1_1cObject.html",tooltip=" "];
+  Node1 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="MyPacket",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classMyPacket.html",tooltip=" "];
+}

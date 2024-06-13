@@ -1,0 +1,40 @@
+file 1159 1714253734                                            
+version 3
+run Net60StoreAndForward-0-20240428-00:35:05-32405
+attr configname Net60StoreAndForward
+attr datetime 20240428-00:35:05
+attr datetimef 20240428-003505
+attr experiment Net60StoreAndForward
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network networks.Net60
+attr processid 32405
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network networks.Net60
+config description "60 node network with store-and-forward switching"
+config **.app.packetLength "32768 bytes"
+config **.destAddresses "\"1 50\""
+config **.sendIaTime "uniform(1ms, 5ms)"
+config **.appType "\"App\""
+config **.app.packetLength "4096 bytes"
+
+vector 0 Net60.rte[50].app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 1 Net60.rte[1].app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+0	1072 21 3 3 0.001156751156 0.001156751156 1 0 0 0 0
+1	1093 65 59 129 0.001951139903 0.002434949188 2 0.000724288 0.001086432 0.00181072 1.704927597568e-06
+

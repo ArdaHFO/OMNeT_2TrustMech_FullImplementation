@@ -1,0 +1,59 @@
+# This file is part of the NetBuilder example
+# id     name      type
+ 1       Node:1      node.Node
+ 2       Node:2      node.Node
+ 3       Node:3      node.Node
+ 4       Node:4      node.Node
+ 5       Node:5      node.Node
+ 6       Node:6      node.Node
+ 7       Node:7      node.Node
+ 8       Node:8      node.Node
+ 9       Node:9      node.Node
+10       Node:10     node.Node
+11       Node:11     node.Node
+12       Node:12     node.Node
+13       Node:13     node.Node
+14       Node:14     node.Node
+15       Node:15     node.Node
+16       Node:16     node.Node
+17       Node:17     node.Node
+18       Node:18     node.Node
+19       Node:19     node.Node
+20       Node:20     node.Node
+21       Node:21     node.Node
+22       Node:22     node.Node
+23       Node:23     node.Node
+24       Node:24     node.Node
+25       Node:25     node.Node
+26       Node:26     node.Node
+27       Node:27     node.Node
+28       Node:28     node.Node
+29       Node:29     node.Node
+30       Node:30     node.Node
+31       Node:31     node.Node
+32       Node:32     node.Node
+33       Node:33     node.Node
+34       Node:34     node.Node
+35       Node:35     node.Node
+36       Node:36     node.Node
+37       Node:37     node.Node
+38       Node:38     node.Node
+39       Node:39     node.Node
+40       Node:40     node.Node
+41       Node:41     node.Node
+42       Node:42     node.Node
+43       Node:43     node.Node
+44       Node:44     node.Node
+45       Node:45     node.Node
+46       Node:46     node.Node
+47       Node:47     node.Node
+48       Node:48     node.Node
+49       Node:49     node.Node
+50       Node:50     node.Node
+51       Node:51     node.Node
+52       Node:52     node.Node
+53       Node:53     node.Node
+54       Node:54     node.Node
+55       Node:55     node.Node
+56       Node:56     node.Node
+

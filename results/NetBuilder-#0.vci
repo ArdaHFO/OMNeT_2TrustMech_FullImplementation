@@ -1,0 +1,116 @@
+file 3642 1717384506                                            
+version 3
+run NetBuilder-0-20240603-06:14:00-51227
+attr configname NetBuilder
+attr datetime 20240603-06:14:00
+attr datetimef 20240603-061400
+attr experiment NetBuilder
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network networks.Dynamic
+attr processid 51227
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network networks.Dynamic
+config **.address "int(replace(fullName(), \"Node:\", \"\"))"
+config **.destAddresses "\"1 50\""
+config **.appType "\"App\""
+config **.app.packetLength "4096 bytes"
+
+vector 0 Dynamic.Node:1.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 1 Dynamic.Node:17.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 2 Dynamic.Node:2.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 3 Dynamic.Node:15.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 4 Dynamic.Node:20.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 5 Dynamic.Node:4.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 6 Dynamic.Node:44.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 7 Dynamic.Node:26.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 8 Dynamic.Node:35.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 9 Dynamic.Node:45.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 10 Dynamic.Node:18.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 11 Dynamic.Node:29.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 12 Dynamic.Node:14.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 13 Dynamic.Node:3.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+vector 14 Dynamic.Node:42.app endToEndDelay:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr title "end-to-end delay of arrived packets"
+attr unit s
+0	3159 30 106 106 0.382482409438 0.382482409438 1 0.256608 0.256608 0.256608 0.065847665664
+1	3189 30 116 116 0.411322160633 0.411322160633 1 0.299376 0.299376 0.299376 0.089625989376
+2	3219 30 123 123 0.433305026124 0.433305026124 1 0.342144 0.342144 0.342144 0.117062516736
+3	3249 30 168 168 0.627600848005 0.627600848005 1 0.299376 0.299376 0.299376 0.089625989376
+4	3279 30 171 171 0.630320137255 0.630320137255 1 0.171072 0.171072 0.171072 0.029265629184
+5	3309 29 244 244 0.99157242119 0.99157242119 1 0.256608 0.256608 0.256608 0.065847665664
+6	3338 30 260 260 1.008357036043 1.008357036043 1 0.171072 0.171072 0.171072 0.029265629184
+7	3368 30 314 314 1.171697195042 1.171697195042 1 0.299376 0.299376 0.299376 0.089625989376
+8	3398 29 323 323 1.212995122755 1.212995122755 1 0.21384 0.21384 0.21384 0.0457275456
+9	3427 30 326 326 1.218166935516 1.218166935516 1 0.256608 0.256608 0.256608 0.065847665664
+10	3457 31 370 370 1.634088258637 1.634088258637 1 0.128304 0.128304 0.128304 0.016461916416
+11	3488 31 418 418 1.842687639589 1.842687639589 1 0.171072 0.171072 0.171072 0.029265629184
+12	3519 60 424 471 1.861847557062 2.16706863212 2 0.21384 0.256608 0.470448 0.111575211264
+13	3579 31 506 506 2.297500215912 2.297500215912 1 0.256608 0.256608 0.256608 0.065847665664
+14	3610 31 533 533 2.399140866827 2.399140866827 1 0.171072 0.171072 0.171072 0.029265629184
+

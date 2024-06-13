@@ -1,0 +1,313 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="OMNeT++ NED doc generator"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+<link rel="stylesheet" href="material-icons.css">
+<link rel="stylesheet" href="material.blue-light_blue.min.css">
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<title>L2Queue</title>
+</head>
+<body>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div id="top" class="mdl-layout__header-row">
+      <span class="mdl-layout-title">L2Queue</span>
+      <div class="mdl-layout-spacer"></div>
+<!--
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
+        <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+          <i class="material-icons">search</i>
+        </label>
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" id="search" />
+          <label class="mdl-textfield__label" for="search">Enter your query...</label>
+        </div>
+      </div>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+        <i class="material-icons">code</i>
+      </button>
+      <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+        <i class="material-icons">more_vert</i>
+      </button>
+      <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
+        <li class="mdl-menu__item">OMNeT++ Website</li>
+      </ul>
+-->
+    </div>
+  </header>
+
+  <div class="drawer mdl-layout__drawer">
+    <nav id="side-nav" class="mdl-navigation">
+      <div id="nav-tree">
+        <div id="nav-tree-contents">
+          <div id="nav-sync" class="sync"></div>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <script type="text/javascript">
+  $(document).ready(function(){initNavTree(location.pathname.split("/").slice(-1).toString(),'');});
+  </script>
+
+  <main class="mdl-layout__content">
+    <div id="doc-content">
+
+    <p>Package: <a class="reference-ned" href="packages.html#node">node</a></p>
+<h2 class="comptitle" style="float: left;">L2Queue</h2>
+<span class="mdl-chip" style="float: right; margin-top: 6pt; background-color: #ff000040;">
+    <span class="mdl-chip__text">simple module</span>
+</span><div style="clear: both;"/>
+<p><a class="reference-cpp" href="../doxy/classL2Queue.html">C++ definition</a></p>
+
+<p>Represents the network interface for a point-to-point connection.</p>
+<p>Packets arriving from the upper layer ("in" gate) are sent out on
+the "line" gate, which is expected to be connected to a link with
+nonzero data rate. Packets that arrive while a previous packet is
+being transmitted are queued up. The maximum queue size in packets
+can be specified in a parameter. Excess frames are simply discarded
+and recorded as statistics.</p>
+<p>The model can be easily extended in several ways: to make it possible to
+query the queue length from another module via a direct method call
+interface, to implement priority queueing, or to collect link statistics
+(utilization, etc.)</p>
+<h3 class="subtitle">Used in compound modules</h3>
+<table class="typestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td><a class="reference-ned" href="node.Node.html">Node</a></td>
+      <td><i>compound&nbsp;module</i></td>
+      <td>
+<p>A "<a href="node.Node.html">Node</a>" consists of a <a href="node.Routing.html">Routing</a> plus an <a href="node.App.html">App</a> module which represents the
+aggregate traffic of the subnets connected to that router.</p>
+</td>
+   </tr>
+</table>
+<h3 class="subtitle">Parameters</h3>
+<table class="paramstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="defaultvalue">Default value</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr class="local">
+      <td>frameCapacity</td>
+      <td>int</td>
+      <td>0</td>
+      <td>
+<p>max number of packets; 0 means no limit</p>
+</td>
+   </tr>
+   <tr class="local">
+      <td>useCutThroughSwitching</td>
+      <td>bool</td>
+      <td>false</td>
+      <td>
+<p>use cut-through switching instead of store-and-forward</p>
+</td>
+   </tr>
+</table>
+<h3 class="subtitle">Properties</h3>
+<table class="propertiestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="value">Value</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr>
+      <td>display</td>
+      <td>i=block/queue;q=queue</td>
+      <td></td>
+   </tr>
+</table>
+<h3 class="subtitle">Gates</h3>
+<table class="gatestable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Direction</th>
+      <th class="gatesize">Size</th>
+      <th class="description">Description</th>
+   </tr>
+   <tr class="local">
+      <td>in</td>
+      <td>input</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>out</td>
+      <td>output</td>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>line</td>
+      <td>inout</td>
+      <td></td>
+      <td></td>
+   </tr>
+</table>
+<h3 class="subtitle">Signals</h3>
+<table class="signalstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="type">Type</th>
+      <th class="unit">Unit</th>
+   </tr>
+   <tr class="local">
+      <td>drop</td>
+      <td>long</td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>qlen</td>
+      <td>long</td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>queueingTime</td>
+      <td>simtime_t</td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>rxBytes</td>
+      <td>long</td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>txBytes</td>
+      <td>long</td>
+      <td></td>
+   </tr>
+   <tr class="local">
+      <td>busy</td>
+      <td>bool</td>
+      <td></td>
+   </tr>
+</table>
+<h3 class="subtitle">Statistics</h3>
+<table class="statisticstable">
+   <tr>
+      <th class="name">Name</th>
+      <th class="title">Title</th>
+      <th class="source">Source</th>
+      <th class="record">Record</th>
+      <th class="unit">Unit</th>
+      <th class="interpolationmode">Interpolation Mode</th>
+   </tr>
+   <tr class="local">
+      <td>drop</td>
+      <td>dropped packet byte length</td>
+      <td></td>
+      <td>vector?, count, sum</td>
+      <td>bytes</td>
+      <td>none</td>
+   </tr>
+   <tr class="local">
+      <td>qlen</td>
+      <td>queue length</td>
+      <td></td>
+      <td>vector?, timeavg, max</td>
+      <td></td>
+      <td>sample-hold</td>
+   </tr>
+   <tr class="local">
+      <td>queueingTime</td>
+      <td>queueing time at dequeue</td>
+      <td></td>
+      <td></td>
+      <td>s</td>
+      <td>none</td>
+   </tr>
+   <tr class="local">
+      <td>rxBytes</td>
+      <td>received packet byte length</td>
+      <td></td>
+      <td>vector?, count, sum, histogram</td>
+      <td>bytes</td>
+      <td>none</td>
+   </tr>
+   <tr class="local">
+      <td>txBytes</td>
+      <td>transmitting packet byte length</td>
+      <td></td>
+      <td>vector?, count, sum, histogram</td>
+      <td>bytes</td>
+      <td>none</td>
+   </tr>
+   <tr class="local">
+      <td>busy</td>
+      <td>server busy state</td>
+      <td></td>
+      <td>vector?, timeavg</td>
+      <td></td>
+      <td>sample-hold</td>
+   </tr>
+</table>
+<h3 class="subtitle">Source code</h3>
+<pre class="src">
+<span style="color: #808080; font-style: italic; ">//
+// Represents the network interface for a point-to-point connection.
+//
+// Packets arriving from the upper layer (&quot;in&quot; gate) are sent out on
+// the &quot;line&quot; gate, which is expected to be connected to a link with
+// nonzero data rate. Packets that arrive while a previous packet is
+// being transmitted are queued up. The maximum queue size in packets
+// can be specified in a parameter. Excess frames are simply discarded
+// and recorded as statistics.
+//
+// The model can be easily extended in several ways: to make it possible to
+// query the queue length from another module via a direct method call
+// interface, to implement priority queueing, or to collect link statistics
+// (utilization, etc.)
+//
+</span><span style="color: #800000; font-weight: bold; ">simple</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">L2Queue</span><span style="color: #3d3d3d; ">
+{
+    </span><span style="color: #800000; font-weight: bold; ">parameters</span><span style="color: #3d3d3d; ">:
+        </span><span style="color: #000080; font-weight: bold; ">int</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">frameCapacity</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">0</span><span style="color: #3d3d3d; ">); </span><span style="color: #808080; font-style: italic; ">// max number of packets; 0 means no limit
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #000080; font-weight: bold; ">bool</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">useCutThroughSwitching</span><span style="color: #3d3d3d; "> = </span><span style="color: #800000; font-weight: bold; ">default</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">false</span><span style="color: #3d3d3d; ">);  </span><span style="color: #808080; font-style: italic; ">// use cut-through switching instead of store-and-forward
+</span><span style="color: #3d3d3d; ">        </span><span style="color: #3d3d3d; font-weight: bold; ">@display</span><span style="color: #3d3d3d; ">(</span><span style="color: #008000; ">&quot;i=block/queue;q=queue&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">qlen</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;long&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">busy</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;bool&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">queueingTime</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;simtime_t&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">drop</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;long&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">txBytes</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;long&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@signal</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">rxBytes</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">type</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;long&quot;</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">qlen</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">title</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;queue length&quot;</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">?,</span><span style="color: #3d3d3d; ">timeavg</span><span style="color: #3d3d3d; ">,</span><span style="color: #800080; ">max</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">interpolationmode</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">sample</span><span style="color: #3d3d3d; ">-</span><span style="color: #3d3d3d; ">hold</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">busy</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">title</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;server busy state&quot;</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">?,</span><span style="color: #3d3d3d; ">timeavg</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">interpolationmode</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">sample</span><span style="color: #3d3d3d; ">-</span><span style="color: #3d3d3d; ">hold</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">queueingTime</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">title</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;queueing time at dequeue&quot;</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">unit</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">s</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">interpolationmode</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">none</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">drop</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">title</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;dropped packet byte length&quot;</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">unit</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">bytes</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">?,</span><span style="color: #3d3d3d; ">count</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">sum</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">interpolationmode</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">none</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">txBytes</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">title</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;transmitting packet byte length&quot;</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">unit</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">bytes</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">?,</span><span style="color: #3d3d3d; ">count</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">sum</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">histogram</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">interpolationmode</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">none</span><span style="color: #3d3d3d; ">);
+        </span><span style="color: #3d3d3d; font-weight: bold; ">@statistic</span><span style="color: #3d3d3d; ">[</span><span style="color: #3d3d3d; ">rxBytes</span><span style="color: #3d3d3d; ">](</span><span style="color: #3d3d3d; ">title</span><span style="color: #3d3d3d; ">=</span><span style="color: #008000; ">&quot;received packet byte length&quot;</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">unit</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">bytes</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">record</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">vector</span><span style="color: #3d3d3d; ">?,</span><span style="color: #3d3d3d; ">count</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">sum</span><span style="color: #3d3d3d; ">,</span><span style="color: #3d3d3d; ">histogram</span><span style="color: #3d3d3d; ">; </span><span style="color: #3d3d3d; ">interpolationmode</span><span style="color: #3d3d3d; ">=</span><span style="color: #3d3d3d; ">none</span><span style="color: #3d3d3d; ">);
+    </span><span style="color: #800000; font-weight: bold; ">gates</span><span style="color: #3d3d3d; ">:
+        </span><span style="color: #000080; font-weight: bold; ">input</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">in</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">output</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">out</span><span style="color: #3d3d3d; ">;
+        </span><span style="color: #000080; font-weight: bold; ">inout</span><span style="color: #3d3d3d; "> </span><span style="color: #3d3d3d; ">line</span><span style="color: #3d3d3d; ">;
+}
+
+
+</span></pre>
+File: <a href="node-L2Queue.ned.html">node/L2Queue.ned</a>
+<hr><p class="footer"><a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top"><img src="by-sa.svg"></a> This documentation is released under the <a href="http://creativecommons.org/licenses/by-sa/3.0" target="_top">Creative Commons license</a></p>
+
+
+    </div><!-- doc-content -->
+  </main>
+</div>
+
+<script type="text/javascript" src="material.min.js"></script>
+</body>
+</html>
