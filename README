@@ -1,0 +1,13 @@
+**Sanal ortamda Omnet çalıştırma
+1) sudo su
+
+2) cd /home/asus/Desktop/omnetpp-6.0.3/
+
+3) source .venv/bin/activate
+
+4) source setenv
+
+5) omnetpp
+
+**Sanal ortamdan çıkış
+deactivate
