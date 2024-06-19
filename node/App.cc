@@ -195,12 +195,6 @@ void App::FilesWritingPacketInformation(MyPacket* pk) {
  //---------------------------------------------------/
  FileWrite_TrustLevel_txt();//Güven seviyesi hesaplama => Güven puanları %25,%50,%75 ve diğer dilimlere giren nodları belirle ve dosya oluştur
  //---------------------------------------------------/
- //Routine for testing - begin
- AttackDetectionRatio(pk, 6270, 0.92,0.94,"Attack_Density-1.txt");
- AttackDetectionRatio(pk, 6870, 0.91,0.93,"Attack_Density-2.txt");
- AttackDetectionRatio(pk, 7250, 0.90,0.92,"Attack_Density-3.txt");
- //Routine for testing - end
- //---------------------------------------------------/
  FileWrite_CpuLevel_txt_And_BatteryLevel_txt(pk);
 }
 void App::FileWrite_Full_txt(MyPacket* pk) {
