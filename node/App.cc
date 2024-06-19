@@ -167,7 +167,8 @@ protected:
     void handleMessage(cMessage *msg) override;
     std::string calculateHash(const MyPacket* packet);
     int autorateNode(const MyPacket* packet);
-    int autorateNode2(const MyPacket* packet);
+    int autorateNodeBirbirineYuksek(const MyPacket* packet);
+    int autorateNodeBayrak(const MyPacket* packet);
     bool bir_grup_kotucul_nodun_bir_noda_saldirisi(int attacker_node, int victim_node);
     bool bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi(int point_giver_node);
     bool bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi(int attacker_node, int victim_node);
@@ -595,11 +596,12 @@ void App::handleMessage(cMessage *msg) {
         if (bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi(attacker_node)) {
                 getParentModule()->bubble("Attack (Scenario 2)");
                 attacker_node_give_value=1;
-                pk->setNodeRating(autorateNode2(pk));
+                pk->setNodeRating(autorateNodeBirbirineYuksek(pk));
             }
         if (bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi(attacker_node,victim_node)) {
             getParentModule()->bubble("Attack (Scenario 3)");
             attacker_node_give_value=1;
+            pk->setNodeRating(autorateNodeBayrak(pk));
             }
         if (attacker_node_give_value > 0)  {
             send(pk, "out");
@@ -647,10 +649,14 @@ bool App::bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi(i
     }
 }
 bool App::bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi(int attacker_node, int victim_node) {
-    if (attacker_node >= 21 && attacker_node <= 30 && victim_node >= 41 && victim_node <= 45) {
-        return true;
+    if (attacker_node >= 21 && attacker_node <= 30 && victim_node >= 41 && victim_node <= 51) {
+        std::random_device rndnd;
+        std::mt19937 gen(rndnd());
+        std::uniform_int_distribution<> dis(21, 30); // 41 ile 51 arasında rastgele bir node seç
+        int selectedNode = dis(gen);
+        return selectedNode;
     } else {
-        return false;
+        return -1; // Koşul sağlanmazsa -1 döndür
     }
 }
 //=====================================================================================/
@@ -693,11 +699,20 @@ int App::autorateNode(const MyPacket* packet) {
     return generatedRating;
 }
 //=====================================================================================/
-int App::autorateNode2(const MyPacket* packet) {
-    //int min = -100;
+int App::autorateNodeBirbirineYuksek(const MyPacket* packet) {
+
     int min = 8;
-    //int max = 100;
     int max = 10;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(min, max);
+    int generatedRating = dis(gen);
+    return generatedRating;
+}
+//=====================================================================================/
+int App::autorateNodeBayrak(const MyPacket* packet) {
+    int min = 0;
+    int max = 5;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(min, max);
