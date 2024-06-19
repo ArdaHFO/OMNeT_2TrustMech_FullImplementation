@@ -167,6 +167,7 @@ protected:
     void handleMessage(cMessage *msg) override;
     std::string calculateHash(const MyPacket* packet);
     int autorateNode(const MyPacket* packet);
+    int autorateNode2(const MyPacket* packet);
     bool bir_grup_kotucul_nodun_bir_noda_saldirisi(int attacker_node, int victim_node);
     bool bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi(int point_giver_node);
     bool bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi(int attacker_node, int victim_node);
@@ -594,6 +595,7 @@ void App::handleMessage(cMessage *msg) {
         if (bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi(attacker_node)) {
                 getParentModule()->bubble("Attack (Scenario 2)");
                 attacker_node_give_value=1;
+                pk->setNodeRating(autorateNode2(pk));
             }
         if (bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi(attacker_node,victim_node)) {
             getParentModule()->bubble("Attack (Scenario 3)");
@@ -682,6 +684,18 @@ bool App::bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldiri
 int App::autorateNode(const MyPacket* packet) {
     //int min = -100;
     int min = 0;
+    //int max = 100;
+    int max = 10;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(min, max);
+    int generatedRating = dis(gen);
+    return generatedRating;
+}
+//=====================================================================================/
+int App::autorateNode2(const MyPacket* packet) {
+    //int min = -100;
+    int min = 8;
     //int max = 100;
     int max = 10;
     std::random_device rd;
