@@ -29,66 +29,6 @@ using namespace omnetpp;
 using namespace std;
 //=====================================================================================/
 int mfieldnames;
-class MaliciousNodeGroup {
-private:
-    int lowerBound;
-    int upperBound;
-    std::string code;
-    std::vector<int> ratings;
-public:
-    MaliciousNodeGroup() : lowerBound(0), upperBound(0), code("") {}
-    MaliciousNodeGroup(int lower, int upper, const std::string& groupCode) : lowerBound(lower), upperBound(upper), code(groupCode) {}
-    void addRating(int rating) { ratings.push_back(rating);}
-    //---------------------------------------------------/
-    bool meetsCondition() const {
-         if (ratings.size() < 3)
-            return false;
-         if (code == "K1") {
-            int consecutiveNegatives = 0;
-            for (int rating : ratings) {
-            if (rating < 0) {
-            consecutiveNegatives++;
-            if (consecutiveNegatives >= 3)
-            return true;
-            } else {
-            consecutiveNegatives = 0;
-            }
-            }
-            return false;
-         }  else if (code == "K2") {
-           int consecutiveNegatives = 0;
-           int consecutivePositives = 0;
-           for (int rating : ratings) {
-           if (rating < 0) {
-           consecutiveNegatives++;
-           consecutivePositives = 0;
-           if (consecutiveNegatives >= 3 && consecutivePositives >= 3)
-           return true;
-           } else {
-           consecutiveNegatives = 0;
-           consecutivePositives++;
-           }
-           }
-           return false;
-        }  else if (code == "K3") {
-            int consecutivePositives = 0;
-            for (int rating : ratings) {
-            if (rating >= 0) {
-            consecutivePositives++;
-            if (consecutivePositives >= 3)
-            return true;
-            } else {
-            consecutivePositives = 0;
-            }
-            }
-            return false;
-         }  else {
-            std::cerr << "Hatalı grup kodu: " << code << std::endl;
-            return false;
-        }
-    }
-    //---------------------------------------------------/
-};
 //=====================================================================================/
 class App;
 //=====================================================================================/
@@ -135,6 +75,7 @@ private:
     void FileWrite_Full_txt(MyPacket* pk);
     void FileWrite_Points_txt(MyPacket* pk);
     void FileWrite_TotalPoints_txt(MyPacket* pk);
+    void FileWrite_Attacks_txt(MyPacket* pk);
     void FileWrite_TrustLevel_txt();
     void FileWrite_CpuLevel_txt_And_BatteryLevel_txt(MyPacket* pk);
     void AttackDetectionRatio(MyPacket *pk, int calcProcess, double min_ratio,double max_ratio, std::string attackFileName);
@@ -156,25 +97,48 @@ private:
     simsignal_t endToEndDelaySignal;
     simsignal_t hopCountSignal;
     simsignal_t sourceAddressSignal;
-    MaliciousNodeGroup K1;
-    MaliciousNodeGroup K2;
-    MaliciousNodeGroup K3;
 public:
     virtual ~App();
     std::string calculateSHA256(const std::string& input) const;
+    //---------------------------------------------------/
+    // Verilen stringi belirtilen uzunluğa kadar boşluklarla tamamlayan fonksiyon.
+    std::string padStringStr(const std::string& str, size_t length) {
+        if (str.length() < length) {
+            return str + std::string(length - str.length(), ' ');
+        }
+        return str;
+    }
+    // Verilen integer değeri stringe çevirip belirtilen uzunluğa kadar boşluklarla tamamlayan fonksiyon.
+    std::string padStringInt(int value, size_t length) {
+        std::ostringstream oss;
+        oss << value;
+        return padStringStr(oss.str(), length);
+    }
+    // Verilen double değeri stringe çevirip belirtilen uzunluğa kadar boşluklarla tamamlayan fonksiyon.
+    std::string padStringDouble(double value, size_t length) {
+        std::ostringstream oss;
+        oss << value;
+        return padStringStr(oss.str(), length);
+    }
+    //---------------------------------------------------/
 protected:
     virtual void initialize() override;
     void handleMessage(cMessage *msg) override;
     std::string calculateHash(const MyPacket* packet);
+
     int autorateNode(const MyPacket* packet);
-    int autorateNodeBirbirineYuksek(const MyPacket* packet);
-    int autorateNodeBayrak(const MyPacket* packet);
+    int bir_grup_kotucul_nodun_bir_noda_saldirisi_autorateNode(const MyPacket* packet) ;
+    int bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi_autorateNode(const MyPacket* packet);
+    int bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi_autorateNode(const MyPacket* packet);
+
     bool bir_grup_kotucul_nodun_bir_noda_saldirisi(int attacker_node, int victim_node);
     bool bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi(int point_giver_node);
     bool bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi(int attacker_node, int victim_node);
+
     bool bir_grup_kotucul_nodun_bir_noda_saldirisi_yakalama(MyPacket *pk,int attacker_node, int victim_node);
     bool bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi_yakalama(MyPacket *pk,int point_giver_node);
     bool bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi_yakalama( MyPacket *pk, int attacker_node, int victim_node);
+
     void nodechangeColor(int minNodeId, int maxNodId, MyPacket* pk);
     void technical_information( MyPacket* pk);
 };
@@ -189,6 +153,8 @@ void App::FilesWritingPacketInformation(MyPacket* pk) {
  FileWrite_Full_txt(pk);
  FileWrite_Points_txt(pk);
  FileWrite_TotalPoints_txt(pk);
+ //---------------------------------------------------/
+ FileWrite_Attacks_txt(pk);
  //---------------------------------------------------/
  Grouped_Network_TotalPoints_Xml();
  Nodes_Network_TotalPoints_Xml();
@@ -209,58 +175,43 @@ void App::FileWrite_Full_txt(MyPacket* pk) {
         int arrivalModuleId = arrivalModule ? arrivalModule->getId() : -1;
         std::string moduleSpacing = (arrivalModuleId < 10) ? "  " : (arrivalModuleId < 100) ? " " : "";
         std::string getClassAndFullName = pk->getClassAndFullName();
-        //std::string  getEncapsulatedPacket = pk->getEncapsulatedPacket()->getClassAndFullName();
-        const char* className = pk->getClassName();
-        int classNameLength = strlen(className);
-        const char* displayString = pk->getDisplayString();
-        int displayStringLength = strlen(displayString);
-        cGate *getSenderGate = pk->getSenderGate();
-        const char *SenderGateGateName = getSenderGate ? getSenderGate->getFullName() : "NULL";
         //---------------------------------------------------/
         fulloutput_file
-        << "|getName             : " << std::setw(20)  << std::right << pk->getName() << "\t"
-        << "|getFullPath         : " << std::setw(50) << std::right << pk->getFullPath() << "\t"
-        << "|getClassAndFullPath : " << std::setw(80) << std::right << pk->getClassAndFullPath() << "\t"
-        << "|Byte Length         : " << std::setw(50) << std::right << pk->getByteLength() << "\t"
-        << "|Creation Time       : " << std::setw(50) << std::right << (std::to_string(pk->getCreationTime().dbl()).length() < 100 ? std::string(100 - std::to_string(pk->getCreationTime().dbl()).length(), ' ') + std::to_string(pk->getCreationTime().dbl()) : std::to_string(pk->getCreationTime().dbl())) << "\t"
-        << "|Id                  : " << std::setw(50) << std::right << pk->getId() << "\t"
-        << "|Src Addr            : " << (pk->getSrcAddr() < 10 ? "  " : (pk->getSrcAddr() < 100 ? " " : "")) << pk->getSrcAddr() << "\t"
-        << "|Dest.Addr           : " << (pk->getDestAddr() < 10 ? "  " : (pk->getDestAddr() < 100 ? " " : "")) << pk->getDestAddr() << "\t"
-        << "|Before Id           : " << (pk->getbeforeid() < 10 ? "  " : (pk->getbeforeid() < 100 ? " " : "")) << pk->getbeforeid() << "\t"
-        << "|After Id            : " << (pk->getafterid() < 10 ? "  " : (pk->getafterid() < 100 ? " " : "")) << pk->getafterid() << "\t"
-        << "|Kind                : " << (pk->getKind() < 10 ? "  " : (pk->getKind() < 100 ? " " : "")) << pk->getKind() << "\t"
-        << std::setw(14) << std::right << "|Arrival Time    : " << std::right << (std::to_string(pk->getArrivalTime().dbl()).length() < 14 ? std::string(14 - std::to_string(pk->getArrivalTime().dbl()).length(), ' ') + std::to_string(pk->getArrivalTime().dbl()) : std::to_string(pk->getArrivalTime().dbl())) << "\t"
-        << std::setw(30) << std::right << "|arrivalGateName : " << std::setw(30) << std::right << arrivalGateName << "\t"
-        << std::setw(30) << std::right << "|arrivalModuleId : " << moduleSpacing << arrivalModuleId << "\t"
-        << "|getArrivalModuleId  : " << (pk->getArrivalModuleId() < 10 ? "  " : (pk->getArrivalModuleId() < 100 ? " " : "")) << pk->getArrivalModuleId() << "\t"
-        << std::setw(80) << std::right << "|getClassAndFullName : " << std::setw(80) << std::right << getClassAndFullName << "\t"
-      //<< "|K5a : " << (getEncapsulatedPacket.length() < 10 ? "  " : (getEncapsulatedPacket.length() < 100 ? " " : "")) << getEncapsulatedPacket << "\t"
-        << "|classNameLength        : " << (classNameLength < 10 ? "  " : (classNameLength < 100 ? " " : "")) << className << "\t"
-      //<< "|getContextPointer      : " << (pk->getContextPointer() < 10 ? "  " : (pk->getContextPointer() < 100 ? " " : "")) << pk->getContextPointer() << "\t"
-      //<< "|getControlInfo         : " << (pk->getControlInfo() < 10 ? "  " : (pk->getControlInfo() < 100 ? " " : "")) << pk->getControlInfo() << "\t"
-        << "|displayStringLength    : " << (displayStringLength < 10 ? "  " : (displayStringLength < 100 ? " " : "")) << displayString << "\t"
-        << "|getEncapsulationId     : " << (pk->getEncapsulationId() < 10 ? "  " : (pk->getEncapsulationId() < 100 ? " " : "")) << pk->getEncapsulationId() << "\t"
-        << "|getEncapsulationTreeId : " << (pk->getEncapsulationTreeId() < 10 ? "  " : (pk->getEncapsulationTreeId() < 100 ? " " : "")) << pk->getEncapsulationTreeId() << "\t"
-        << "|getHopCount            : " << (pk->getHopCount() < 10 ? "  " : (pk->getHopCount() < 100 ? " " : "")) << pk->getHopCount() << "\t"
-        << "|getInsertOrder         : " << (pk->getInsertOrder() < 10 ? "  " : (pk->getInsertOrder() < 100 ? " " : "")) << pk->getInsertOrder() << "\t"
-        << "|getLiveMessageCount    : " << (pk->getLiveMessageCount() < 10 ? "  " : (pk->getLiveMessageCount() < 100 ? " " : "")) << pk->getLiveMessageCount() << "\t"
-        << "|getLiveObjectCount     : " << (pk->getLiveObjectCount() < 10 ? "  " : (pk->getLiveObjectCount() < 100 ? " " : "")) << pk->getLiveObjectCount() << "\t"
-      //<< "|getNamePooling         : " << (pk->getNamePooling() < 10 ? "  " : (pk->getNamePooling() < 100 ? " " : "")) << pk->getNamePooling() << "\t"
-      //<< "|getSchedulingPriority  : " << (pk->getSchedulingPriority() < 10 ? "  " : (pk->getSchedulingPriority() < 100 ? " " : "")) << pk->getSchedulingPriority() << "\t"
-        << std::setw(30) << std::right << "|SenderGateGateName  : " << std::setw(30) << std::right << SenderGateGateName << "\t"
-      //<< "|getSenderModule : " <<  pk->getSenderModule() << "\t"
-      //<< "|getSenderModuleId : " <<  pk->getSenderModuleId() << "\t"
-        << "|getSenderModuleId : " << (pk->getSenderModuleId() < 10 ? "  " : (pk->getSenderModuleId() < 100 ? " " : "")) << pk->getSenderModuleId() << "\t"
-        << "|getSrcProcId : " << pk->getSrcProcId() << "\t"
-        << "|getShareCount : " << pk->getShareCount() << "\t"
-        << "|getDescriptor : " << pk->getDescriptor() << "\t"
-        << "|getPreviousEventNumber : " << (pk->getPreviousEventNumber() < 10 ? "  " : (pk->getPreviousEventNumber() < 100 ? " " : "")) << pk->getPreviousEventNumber() << "\t"
-      //<< "|getOwner : " << pk->getOwner() << "\t"
-        << "|getSenderGateId : " << (pk->getSenderGateId() < 10 ? "  " : (pk->getSenderGateId() < 100 ? " " : "")) << pk->getSenderGateId() << "\t"
-      //<< "|privateDup : " << pk->privateDup() << "\t"
-        << "|Src Node Rating : " << (std::to_string(pk->getNodeRating()).length() < 4 ? std::string(4 - std::to_string(pk->getNodeRating()).length(), ' ') + std::to_string(pk->getNodeRating()) : std::to_string(pk->getNodeRating())) << "\t"
-        << "|Code : " << pk->getGroupCode() << "\t"
-        << "|Prev.Hash : " << pk->getPrevHash() << "\t";
+        << "|Id : " <<std::left << padStringInt(pk->getId(),7) << "\t"
+        << "|getName : " << std::left << padStringStr(pk->getName(),15) << "\t"
+        << "|getFullPath : " << std::left << padStringStr(pk->getFullPath(), 45) << "\t"
+        << "|getClassAndFullPath : " << std::left << padStringStr(pk->getClassAndFullPath(), 55) << "\t"
+        << "|getClassAndFullName : " << std::left << padStringStr(getClassAndFullName,25) << "\t"
+        << "|getOwner : " << std::left << padStringStr(pk->getOwner()->getFullName(),20) << "\t"
+        << "|Byte Length : " << std::left << padStringInt(pk->getByteLength(),5) << "\t"
+        << "|Creation Time : " << std::left<< padStringDouble(pk->getCreationTime().dbl(),10) << "\t"
+        << "|Arrival Time : " << std::left << padStringDouble(pk->getArrivalTime().dbl(),10) << "\t"
+        << "|arrivalGateName : " << std::left << padStringStr(arrivalGateName,10) << "\t"
+        << "|arrivalModuleId : " << std::left << padStringInt(arrivalModuleId,7) << "\t"
+        << "|getArrivalModuleId : " << std::left << padStringInt(pk->getArrivalModuleId(),7) << "\t"
+        << "|getSenderModuleId : " << std::left << padStringInt(pk->getSenderModuleId(),7) << "\t"
+        << "|getSenderGateId : " << std::left << padStringInt(pk->getSenderGateId(),7) << "\t"
+        << "|SenderGateGateName : " << std::left << padStringStr(pk->getSenderGate()->getName(),7) << "\t"
+        << "|getSenderGateConnectionId : " << std::left << padStringInt(pk->getSenderGate()->getConnectionId() ,7) << "\t"
+        << "|getSendingTime : " << std::left << padStringDouble(pk->getSendingTime().dbl(),10) << "\t"
+        << "|getEncapsulationId : " << std::left << padStringInt(pk->getEncapsulationId(),7) << "\t"
+        << "|getEncapsulationTreeId : " << std::left << padStringInt(pk->getEncapsulationTreeId(),7) << "\t"
+        << "|getHopCount : " << std::left << padStringInt(pk->getHopCount(),7) << "\t"
+        << "|getInsertOrder : " << std::left << padStringInt(pk->getInsertOrder(),7) << "\t"
+        << "|getLiveMessageCount : " << std::left << padStringInt(pk->getLiveMessageCount(),7) << "\t"
+        << "|getLiveObjectCount : " << std::left << padStringInt(getLiveObjectCount(),7) << "\t"
+        << "|getShareCount : " << std::left << padStringInt(pk->getShareCount(),7) << "\t"
+        << "|getDescriptor : " << std::left << padStringStr(pk->getDescriptor()->getFullName(),15) << "\t"
+        << "|getPreviousEventNumber : " << std::left << padStringInt(pk->getPreviousEventNumber(),7) << "\t"
+        << "|Code : " << std::left << padStringStr(pk->getGroupCode(),7) << "\t"
+        << "|Kind : " << std::left << padStringInt(pk->getKind(),7) << "\t"
+        << "|Dest.Addr: " << std::left << padStringInt(pk->getDestAddr(),7) << "\t"
+        << "|Before Id : " << std::left << padStringInt(pk->getbeforeid(),7) << "\t"
+        << "|After Id : " << std::left << padStringInt(pk->getafterid(),7) << "\t"
+        << "|Src Addr : " << std::left << padStringInt(pk->getSrcAddr(),7) << "\t"
+        << "|getSrcProcId : " << std::left << padStringInt(pk->getSrcProcId(),7) << "\t"
+        << "|SrcNodeRating : " << std::left << padStringInt(pk->getNodeRating(),7) << "\t"
+        << "|SrcgetPrevHash : " << std::left << padStringStr(pk->getPrevHash(),100) << "\t";
         fulloutput_file << std::endl;
         //---------------------------------------------------/
         fulloutput_file.close();
@@ -292,7 +243,7 @@ void App::FileWrite_Points_txt(MyPacket* pk) {
 void App::FileWrite_TotalPoints_txt(MyPacket* pk) {
     std::string PointsTotalfileName = "./datafiles/TotalPoints.txt";
     std::ofstream PointsTotal_file(PointsTotalfileName, std::ios::app);
-    // Döngüyü belirli bir süre beklet (örneğin, 1 saniye)
+
     // std::this_thread::sleep_for(std::chrono::seconds(1));
     struct Data {
         int totalRating = 0;
@@ -311,19 +262,17 @@ void App::FileWrite_TotalPoints_txt(MyPacket* pk) {
        }
        std::unordered_map<int, Data> sourceData;
        std::string line;
-       // Başlık satırını oku ve atla
        std::getline(inputFile, line);
        while (std::getline(inputFile, line)) {
            std::istringstream iss(line);
            int sourceID, destinationID, rating, votes;
            if (!(iss >> sourceID >> destinationID >> rating >> votes)) {
                std::cout << "Veri okunamadı!" << std::endl;
-               continue; // Hatalı satırı atla
+               continue; 
            }
            sourceData[sourceID].totalRating += rating;
            sourceData[sourceID].totalVotes += votes;
        }
-       // Sonuçları TotalPoints.txt dosyasına yaz
        for (const auto& entry : sourceData) {
            outputFile
                << std::setw(8)  << std::right << entry.first << "\t"
@@ -333,6 +282,29 @@ void App::FileWrite_TotalPoints_txt(MyPacket* pk) {
        inputFile.close();
        outputFile.close();
        std::cout << "İşlem tamamlandı. Sonuçlar TotalPoints.txt dosyasına yazıldı." << std::endl;
+}
+void App::FileWrite_Attacks_txt(MyPacket* pk) {
+    std::string PointsfileName = "./datafiles/Attacks.txt";
+    std::ofstream Points_file(PointsfileName, std::ios::app);
+    if (Points_file.is_open() && mfieldnames==0) {
+        Points_file << std::setw(10) << std::left << "Source_ID"
+                    << std::setw(15) << std::left << "Destination_ID"
+                    << std::setw(7) << std::left << "Rating"
+                    << std::setw(5) << std::left << "Votes"
+                    << std::setw(5) << std::left << "Code"<< std::endl;
+        Points_file.close();
+        std::cout << "Başlıklar dosyaya yazıldı.1" << std::endl;
+      }
+    if (Points_file.is_open()) {
+        Points_file << std::setw(5) << pk->getbeforeid()
+                     << std::setw(13) <<pk->getafterid()
+                     << std::setw(11) << pk->getNodeRating()
+                     << std::setw(6) << 1
+                    <<  std::left << padStringStr(pk->getGroupCode(),7) << std::endl;
+
+         Points_file.close();
+        EV << "Dosyaya içerik başarıyla eklendi.1" << std::endl;
+        }
 }
 void App::FileWrite_CpuLevel_txt_And_BatteryLevel_txt(MyPacket* pk){
     //---------------------------------------------------------------------------------
@@ -423,8 +395,6 @@ void App::FileWrite_TrustLevel_txt() {
     }
  };
 //----------------------------------
-// Dosyadan verileri okuma
-//----------------------------------
 std::ifstream inputFile("./datafiles/TotalPoints.txt");
 if (!inputFile.is_open()) {
 std::cout << "Dosya bulunamadı!" << endl;
@@ -449,13 +419,8 @@ std::string line;
 
    }
    inputFile.close();
-
-//----------------------------------
-// Total_Rating'e göre azalan şekilde sıralama
 //----------------------------------
 std::sort(records.begin(), records.end(), Record::compareRecords);
-//----------------------------------
-// Sıra numarası ve yeni sütun değerlerini hesaplama
 //----------------------------------
 double quarter = numNodes * 0.25;
    double half = numNodes * 0.50;
@@ -474,8 +439,6 @@ double quarter = numNodes * 0.25;
        }
    }
 
-//----------------------------------
-// Çıktıyı yazdırma
 //----------------------------------
 std::ofstream outFile("./datafiles/TrustLevel.txt");
 if (!outFile.is_open()) {
@@ -520,14 +483,17 @@ void App::AttackDetectionRatio(MyPacket *pk, int calcProcess, double min_ratio,d
  }
 //=====================================================================================/
 void App::initialize() {
-    numNodes = 50;
-    myAddress = par("address");
-    packetLengthBytes = &par("packetLength");
-    sendIATime = &par("sendIaTime");
-    pkCounter = 0;
+    numNodes = 56;//Toplam düğüm sayısı
+    myAddress = par("address");//Uygulamanın bu düğümün adresi
+    packetLengthBytes = &par("packetLength");//Paket uzunluğunu belirleyen parametre
+    sendIATime = &par("sendIaTime");//Paket gönderim aralığını belirleyen parametre
+    pkCounter = 0;//Üretilen paketlerin sayısını tutan sayaç
     std::string prevHash = "INITIAL_HASH_VALUE";
     WATCH(pkCounter);
     WATCH(myAddress);
+    //----------------------------------------------------------//
+   //Destinasyon Adreslerinin Parçalanması->başla
+    //destAddresses parametresi içinde belirtilen adresler parçalanarak destAddresses vektörüne eklenir. En az bir adres belirtilmemişse, bir hata üretir.
     const char *destAddressesPar = par("destAddresses");
     cStringTokenizer tokenizer(destAddressesPar);
     const char *token;
@@ -535,14 +501,20 @@ void App::initialize() {
           destAddresses.push_back(atoi(token));
     if (destAddresses.size() == 0)
        throw cRuntimeError("At least one address must be specified in the destAddresses parameter!");
+    //Destinasyon Adreslerinin Parçalanması->bitir
+    //----------------------------------------------------------//
+    //nextPacket adında yeni bir ileti (cMessage) oluşturulur ve belirlenen gönderim aralığına göre zamanlanır.->başla
     generatePacket = new cMessage("nextPacket");
     scheduleAt(sendIATime->doubleValue(), generatePacket);
+    //nextPacket adında yeni bir ileti (cMessage) oluşturulur ve belirlenen gönderim aralığına göre zamanlanır.->bitir
+    //----------------------------------------------------------//
+    //Simülasyon sırasında kullanılacak sinyaller (örneğin, gecikme, atlama sayısı, kaynak adresi gibi) kaydedilir.->başla
     endToEndDelaySignal = registerSignal("endToEndDelay");
     hopCountSignal = registerSignal("hopCount");
     sourceAddressSignal = registerSignal("sourceAddress");
-    K1 = MaliciousNodeGroup(1, 20, "K1");
-    K2 = MaliciousNodeGroup(21, 40, "K2");
-    K3 = MaliciousNodeGroup(41, 50, "K3");
+    //Simülasyon sırasında kullanılacak sinyaller (örneğin, gecikme, atlama sayısı, kaynak adresi gibi) kaydedilir.->bitir
+    //----------------------------------------------------------//
+    //İlk blok (genesis blok) için bir MyPacket oluşturulur ve gerekli özellikler ayarlanır. Bu paket, blok zincirindeki ilk bloğudur->başla
     MyPacket *genesisPacket = new MyPacket("Genesis Block");
     genesisPacket->setByteLength(packetLengthBytes->intValue());
     genesisPacket->setKind(intuniform(0, 7));
@@ -551,83 +523,107 @@ void App::initialize() {
     genesisPacket->setPrevHash(prevHash);
     Block *genesisBlock = new Block(genesisPacket, prevHash);
     blockchain.push_back(genesisBlock);
+    //İlk blok (genesis blok) için bir MyPacket oluşturulur ve gerekli özellikler ayarlanır. Bu paket, blok zincirindeki ilk bloğudur->bitir
+    //----------------------------------------------------------//
+    //Gruplu ağ verilerini işlemek için GroupedNetworkData fonksiyonu çağrılır.->başla
     GroupedNetworkData();
+    //Gruplu ağ verilerini işlemek için GroupedNetworkData fonksiyonu çağrılır.->bitir
+    //----------------------------------------------------------//
 }
 //=====================================================================================/
 void App::handleMessage(cMessage *msg) {
-    if (msg == generatePacket) {
+    if (msg == generatePacket) {//Gelen msg değişkeninin generatePacket pointer'ına eşit olup olmadığını kontrol et
+        //----------------------------------------------------------//
+        //Rastgele bir hedef adres seçilir (destAddress), ancak bu adres üreteci düğümün adresi (myAddress) veya sabit bir adres (56) ile aynı olamaz.->başla
         int destAddress;
         do {
             destAddress = intuniform(1, numNodes);
-        } while (destAddress == myAddress || destAddress == 50);
+        } while (destAddress == myAddress || destAddress == 56);
+        //Rastgele bir hedef adres seçilir (destAddress), ancak bu adres üreteci düğümün adresi (myAddress) veya sabit bir adres (56) ile aynı olamaz.->bitir
+        //----------------------------------------------------------//
+        //Paketin adı oluşturulur (pkname), örneğin "pk-5-to-10-#1".->başla
         char pkname[40];
         sprintf(pkname, "pk-%d-to-%d-#%ld", myAddress, destAddress, pkCounter++);
+        //Paketin adı oluşturulur (pkname), örneğin "pk-5-to-10-#1".->bitir
+        //----------------------------------------------------------//
         EV << "generating packet " << pkname << endl;
+        //----------------------------------------------------------//
+        //MyPacket tipinde yeni bir paket oluşturulur ve paketin özellikleri (byteLength, kind, srcAddr, destAddr) ayarlanır.->başla
         MyPacket *pk = new MyPacket(pkname);
         pk->setByteLength(packetLengthBytes->intValue());
         pk->setKind(intuniform(0, 7));
         pk->setSrcAddr(myAddress);
         pk->setDestAddr(destAddress);
+        //MyPacket tipinde yeni bir paket oluşturulur ve paketin özellikleri (byteLength, kind, srcAddr, destAddr) ayarlanır.->bitir
+        //----------------------------------------------------------//
+        //Blok zinciri (blockchain) üzerindeki son bloğun hash değeri ve düğümün puanı (nodeRating) pakete ekle->başla
         pk->setPrevHash(blockchain.back()->getHash());
         pk->setNodeRating(autorateNode(pk));
-        if (K1.meetsCondition())
-            pk->setGroupCode("K1");
-        else if (K2.meetsCondition())
-            pk->setGroupCode("K2");
-        else if (K3.meetsCondition())
-            pk->setGroupCode("K3");
-        else
-        pk->setGroupCode("None");
+        //Blok zinciri (blockchain) üzerindeki son bloğun hash değeri ve düğümün puanı (nodeRating) pakete ekle->bitir
+        //----------------------------------------------------------//
+        //Paketin beforid ve afterid değeri atanır->başla
         pk->setbeforeid(myAddress);
         pk->setafterid(destAddress);
+        //Paketin beforid ve afterid değeri atanır->bitir
+        //----------------------------------------------------------//
+        //Yeni bir blok oluşturulur ve blok zincirine ekle->başla
         Block *newBlock = new Block(pk, blockchain.back()->getHash());
         blockchain.push_back(newBlock);
+        //Yeni bir blok oluşturulur ve blok zincirine ekle->bitir
         //----------------------------------------------------------//
-        //Attack mechanism calling
+        //Attack mechanism calling-başla
         //----------------------------------------------------------//
         int victim_node = pk->getDestAddr();
         int attacker_node = myAddress;
         int attacker_node_give_value = 0;
         if (bir_grup_kotucul_nodun_bir_noda_saldirisi(attacker_node, victim_node)) {
-                       getParentModule()->bubble("Attack (Scenario 1)");
-                       attacker_node_give_value=1;
-            }
-
+           getParentModule()->bubble("Attack (Scenario 1)");
+           attacker_node_give_value=1;
+           pk->setNodeRating(bir_grup_kotucul_nodun_bir_noda_saldirisi_autorateNode(pk));
+           pk->setGroupCode("A1");
+           }
         if (bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi(attacker_node)) {
-                getParentModule()->bubble("Attack (Scenario 2)");
-                attacker_node_give_value=1;
-                pk->setNodeRating(autorateNodeBirbirineYuksek(pk));
-            }
+           getParentModule()->bubble("Attack (Scenario 2)");
+           attacker_node_give_value=1;
+           pk->setNodeRating(bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi_autorateNode(pk));
+           pk->setGroupCode("A2");
+           }
         if (bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi(attacker_node,victim_node)) {
-            getParentModule()->bubble("Attack (Scenario 3)");
-            attacker_node_give_value=1;
-            pk->setNodeRating(autorateNodeBayrak(pk));
-            }
+           getParentModule()->bubble("Attack (Scenario 3)");
+           attacker_node_give_value=1;
+           pk->setNodeRating(bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi_autorateNode(pk));
+           pk->setGroupCode("A3");
+           }
+        //----------------------------------------------------------//
         if (attacker_node_give_value > 0)  {
-            send(pk, "out");
+           send(pk, "out");
+        }else{
+            pk->setGroupCode("A0");
         }
         //----------------------------------------------------------//
-        //Trust mechanism calling
+        //Attack mechanism calling-bitir
         //----------------------------------------------------------//
         scheduleAt(simTime() + sendIATime->doubleValue(), generatePacket);
-           if (hasGUI()){
-               //getParentModule()->bubble("Generating packet for blockchain...");
-               FilesWritingPacketInformation(pk);
+        //----------------------------------------------------------//
+        if (hasGUI()){//Eğer arayüz varsa, bazı görsel geribildirim işlemleri yapılır.
+           //getParentModule()->bubble("Generating packet for blockchain...");
+           FilesWritingPacketInformation(pk);
            }
   } else {
+            //Gelen msg bir MyPacket tipine dönüştürülür ve işlenir. Bu kısımda paketin adı, atlama sayısı gibi bilgiler kaydedilir ve görsel geribildirim yapılır.-başla
              MyPacket *pk = check_and_cast<MyPacket *>(msg);
-             EV << "received packet " << pk->getName() << " after " << pk->getHopCount() << "hops" << endl;
-             emit(endToEndDelaySignal, simTime() - pk->getCreationTime());
-             emit(hopCountSignal, pk->getHopCount());
-             emit(sourceAddressSignal, pk->getSrcAddr());
-             if (hasGUI()){
-                 getParentModule()->bubble("Arrived!");
-                 //***********************************************************
-                 nodechangeColor(1,10,pk);
-                 technical_information(pk);
-                 //***********************************************************
-                 FilesWritingPacketInformation(pk);
-             }
+                    EV << "received packet " << pk->getName() << " after " << pk->getHopCount() << "hops" << endl;
+                    emit(endToEndDelaySignal, simTime() - pk->getCreationTime());
+                    emit(hopCountSignal, pk->getHopCount());
+                    emit(sourceAddressSignal, pk->getSrcAddr());
+                    if (hasGUI()){
+                       getParentModule()->bubble("Arrived!");
+                       //****************
+                       nodechangeColor(1,10,pk);
+                       technical_information(pk);
+                       //****************
+                       FilesWritingPacketInformation(pk);
+                     }
               delete pk;
             }
   }
@@ -635,35 +631,35 @@ void App::handleMessage(cMessage *msg) {
 //Attack mechanisms functions
 //=====================================================================================/
 bool App::bir_grup_kotucul_nodun_bir_noda_saldirisi(int attacker_node, int victim_node) {
-    if (attacker_node >= 1 && attacker_node <= 10 && victim_node == 40 ) {
+    if (attacker_node >= 1 && attacker_node <= 10 && victim_node == 15 ) {
         return true;
     } else {
         return false;
     }
 }
 bool App::bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi(int point_giver_node) {
-     if (point_giver_node >= 11 && point_giver_node <= 20 ) {
+     if (point_giver_node >= 16 && point_giver_node <= 20 ) {
         return true;
     } else {
         return false;
     }
 }
 bool App::bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi(int attacker_node, int victim_node) {
-    if (attacker_node >= 21 && attacker_node <= 30 && victim_node >= 41 && victim_node <= 51) {
+    if (attacker_node >= 21 && attacker_node <= 25 && victim_node >= 31 && victim_node <= 35) {
         std::random_device rndnd;
         std::mt19937 gen(rndnd());
-        std::uniform_int_distribution<> dis(21, 30); // 41 ile 51 arasında rastgele bir node seç
-        int selectedNode = dis(gen);
+        std::uniform_int_distribution<> dis(21, 30);
+        bool selectedNode = dis(gen);
         return selectedNode;
     } else {
-        return -1; // Koşul sağlanmazsa -1 döndür
+        return false;
     }
 }
 //=====================================================================================/
 //Trust mechanisms functions
 //=====================================================================================/
 bool App::bir_grup_kotucul_nodun_bir_noda_saldirisi_yakalama( MyPacket *pk, int attacker_node, int victim_node) {
-    if (attacker_node >= 1 && attacker_node >= 10 && victim_node == 40 ) {
+    if (attacker_node >= 1 && attacker_node >= 10 && victim_node == 15 ) {
         FilesWritingPacketInformation(pk);
         return true;
     } else {
@@ -671,7 +667,7 @@ bool App::bir_grup_kotucul_nodun_bir_noda_saldirisi_yakalama( MyPacket *pk, int 
     }
 }
 bool App::bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi_yakalama( MyPacket *pk, int point_giver_node) {
-     if (point_giver_node >= 11 && point_giver_node >= 20 ) {
+     if (point_giver_node >= 16 && point_giver_node <= 20 ) {
         FilesWritingPacketInformation(pk);
          return true;
     } else {
@@ -679,7 +675,7 @@ bool App::bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi_y
     }
 }
 bool App::bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi_yakalama( MyPacket *pk, int attacker_node, int victim_node) {
-    if (attacker_node >= 21 && attacker_node <= 30 && victim_node >= 41 && victim_node <= 45) {
+    if (attacker_node >= 21 && attacker_node <= 25 && victim_node >= 31 && victim_node <= 35) {
         FilesWritingPacketInformation(pk);
         return true;
     } else {
@@ -699,8 +695,17 @@ int App::autorateNode(const MyPacket* packet) {
     return generatedRating;
 }
 //=====================================================================================/
-int App::autorateNodeBirbirineYuksek(const MyPacket* packet) {
-
+int App::bir_grup_kotucul_nodun_bir_noda_saldirisi_autorateNode(const MyPacket* packet) {
+    int min = 0;
+    int max = 5;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(min, max);
+    int generatedRating = dis(gen);
+    return generatedRating;
+}
+//=====================================================================================/
+int App::bir_grup_kotucul_nodun_kendi_icinde_birbirlerine_yuksek_puan_vermesi_autorateNode(const MyPacket* packet) {
     int min = 8;
     int max = 10;
     std::random_device rd;
@@ -710,7 +715,7 @@ int App::autorateNodeBirbirineYuksek(const MyPacket* packet) {
     return generatedRating;
 }
 //=====================================================================================/
-int App::autorateNodeBayrak(const MyPacket* packet) {
+int App::bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldirisi_autorateNode(const MyPacket* packet) {
     int min = 0;
     int max = 5;
     std::random_device rd;
@@ -822,6 +827,7 @@ Block::Block(MyPacket* data, const std::string& prevHash) {
  }
 //=====================================================================================/
 std::string Block::calculateHash(const App& app) const {
+
     std::string blockInfo = prevHash + data->getName() +
                             std::to_string(data->getByteLength()) +
                             std::to_string(timestamp)+
