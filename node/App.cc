@@ -69,7 +69,7 @@ public:
 //=====================================================================================/
 class App : public cSimpleModule {
 private:
-    cTextFigure *textFigure1; // textFigure değişkenini tanımlayın
+    cTextFigure *textFigure1; 
     //---------------------------------------------------/
     void FilesWritingPacketInformation(MyPacket* pk);
     void FileWrite_Full_txt(MyPacket* pk);
@@ -79,6 +79,7 @@ private:
     void FileWrite_TrustLevel_txt();
     void FileWrite_CpuLevel_txt_And_BatteryLevel_txt(MyPacket* pk);
     void AttackDetectionRatio(MyPacket *pk, int calcProcess, double min_ratio,double max_ratio, std::string attackFileName);
+    void Write_Content_to_All_Nodes(const std::string& SourceFile, int NodeCount);
     std::map<int, int> nodeRatings;
     void GroupedNetworkData();
     void Grouped_Network_TotalPoints_Xml();
@@ -101,20 +102,17 @@ public:
     virtual ~App();
     std::string calculateSHA256(const std::string& input) const;
     //---------------------------------------------------/
-    // Verilen stringi belirtilen uzunluğa kadar boşluklarla tamamlayan fonksiyon.
     std::string padStringStr(const std::string& str, size_t length) {
         if (str.length() < length) {
             return str + std::string(length - str.length(), ' ');
         }
         return str;
     }
-    // Verilen integer değeri stringe çevirip belirtilen uzunluğa kadar boşluklarla tamamlayan fonksiyon.
     std::string padStringInt(int value, size_t length) {
         std::ostringstream oss;
         oss << value;
         return padStringStr(oss.str(), length);
     }
-    // Verilen double değeri stringe çevirip belirtilen uzunluğa kadar boşluklarla tamamlayan fonksiyon.
     std::string padStringDouble(double value, size_t length) {
         std::ostringstream oss;
         oss << value;
@@ -161,7 +159,7 @@ void App::FilesWritingPacketInformation(MyPacket* pk) {
  GroupedNetworkDataWithGroupTotalsPoints_Xml();
  All_Network_TotalPoints_Xml();
  //---------------------------------------------------/
- FileWrite_TrustLevel_txt();//Güven seviyesi hesaplama => Güven puanları %25,%50,%75 ve diğer dilimlere giren nodları belirle ve dosya oluştur
+ FileWrite_TrustLevel_txt();
  //---------------------------------------------------/
  FileWrite_CpuLevel_txt_And_BatteryLevel_txt(pk);
 }
@@ -169,52 +167,58 @@ void App::FileWrite_Full_txt(MyPacket* pk) {
      std::string fulloutput_fileName = "./datafiles/Full.txt";
      std::ofstream fulloutput_file(fulloutput_fileName, std::ios::app);
      if (fulloutput_file.is_open() ) {
-        cGate *arrivalGate = pk->getArrivalGate();
-        const char *arrivalGateName = arrivalGate ? arrivalGate->getFullName() : "NULL";
-        cModule *arrivalModule = pk->getArrivalModule();
-        int arrivalModuleId = arrivalModule ? arrivalModule->getId() : -1;
-        std::string moduleSpacing = (arrivalModuleId < 10) ? "  " : (arrivalModuleId < 100) ? " " : "";
-        std::string getClassAndFullName = pk->getClassAndFullName();
         //---------------------------------------------------/
-        fulloutput_file
-        << "|Id : " <<std::left << padStringInt(pk->getId(),7) << "\t"
+        std::stringstream fulloutput;
+        fulloutput
+        /*
+        << "|getId : " <<std::left << padStringInt(pk->getId(),7) << "\t"
         << "|getName : " << std::left << padStringStr(pk->getName(),15) << "\t"
         << "|getFullPath : " << std::left << padStringStr(pk->getFullPath(), 45) << "\t"
         << "|getClassAndFullPath : " << std::left << padStringStr(pk->getClassAndFullPath(), 55) << "\t"
-        << "|getClassAndFullName : " << std::left << padStringStr(getClassAndFullName,25) << "\t"
-        << "|getOwner : " << std::left << padStringStr(pk->getOwner()->getFullName(),20) << "\t"
-        << "|Byte Length : " << std::left << padStringInt(pk->getByteLength(),5) << "\t"
-        << "|Creation Time : " << std::left<< padStringDouble(pk->getCreationTime().dbl(),10) << "\t"
-        << "|Arrival Time : " << std::left << padStringDouble(pk->getArrivalTime().dbl(),10) << "\t"
-        << "|arrivalGateName : " << std::left << padStringStr(arrivalGateName,10) << "\t"
-        << "|arrivalModuleId : " << std::left << padStringInt(arrivalModuleId,7) << "\t"
+        << "|getClassAndFullName : " << std::left << padStringStr(pk->getClassAndFullName(),25) << "\t"
+        << "|getOwner->getFullName : " << std::left << padStringStr(pk->getOwner()->getFullName(),20) << "\t"
+        << "|getByteLength : " << std::left << padStringInt(pk->getByteLength(),5) << "\t"
+        << "|getTotalObjectCount : " << std::left << padStringInt(pk->getTotalObjectCount(),7) << "\t"
+        */
+        << "|getCreationTime : " << std::left<< padStringDouble(pk->getCreationTime().dbl(),10) << "\t"
+        /*
+        << "|getArrivalTime : " << std::left << padStringDouble(pk->getArrivalTime().dbl(),10) << "\t"
+        << "|arrivalGateName->getFullName : " << std::left << padStringStr(pk->getArrivalGate() ? pk->getArrivalGate()->getFullName() : "NULL",10) << "\t"
+        << "|arrivalModuleId->getId : " << std::left << padStringInt( pk->getArrivalModule() ? pk->getArrivalModule()->getId() : -1, 7) << "\t"
         << "|getArrivalModuleId : " << std::left << padStringInt(pk->getArrivalModuleId(),7) << "\t"
         << "|getSenderModuleId : " << std::left << padStringInt(pk->getSenderModuleId(),7) << "\t"
         << "|getSenderGateId : " << std::left << padStringInt(pk->getSenderGateId(),7) << "\t"
-        << "|SenderGateGateName : " << std::left << padStringStr(pk->getSenderGate()->getName(),7) << "\t"
-        << "|getSenderGateConnectionId : " << std::left << padStringInt(pk->getSenderGate()->getConnectionId() ,7) << "\t"
+        << "|getDescriptor->getFullPath : " << std::left << padStringStr(pk->getDescriptor()->getFullPath() ,7) << "\t"
         << "|getSendingTime : " << std::left << padStringDouble(pk->getSendingTime().dbl(),10) << "\t"
         << "|getEncapsulationId : " << std::left << padStringInt(pk->getEncapsulationId(),7) << "\t"
         << "|getEncapsulationTreeId : " << std::left << padStringInt(pk->getEncapsulationTreeId(),7) << "\t"
         << "|getHopCount : " << std::left << padStringInt(pk->getHopCount(),7) << "\t"
         << "|getInsertOrder : " << std::left << padStringInt(pk->getInsertOrder(),7) << "\t"
         << "|getLiveMessageCount : " << std::left << padStringInt(pk->getLiveMessageCount(),7) << "\t"
-        << "|getLiveObjectCount : " << std::left << padStringInt(getLiveObjectCount(),7) << "\t"
+        << "|getLiveObjectCount : " << std::left << padStringInt(pk->getLiveObjectCount(),7) << "\t"
         << "|getShareCount : " << std::left << padStringInt(pk->getShareCount(),7) << "\t"
-        << "|getDescriptor : " << std::left << padStringStr(pk->getDescriptor()->getFullName(),15) << "\t"
+        << "|getDescriptor->getFullName : " << std::left << padStringStr(pk->getDescriptor()->getFullName(),15) << "\t"
         << "|getPreviousEventNumber : " << std::left << padStringInt(pk->getPreviousEventNumber(),7) << "\t"
-        << "|Code : " << std::left << padStringStr(pk->getGroupCode(),7) << "\t"
-        << "|Kind : " << std::left << padStringInt(pk->getKind(),7) << "\t"
-        << "|Dest.Addr: " << std::left << padStringInt(pk->getDestAddr(),7) << "\t"
-        << "|Before Id : " << std::left << padStringInt(pk->getbeforeid(),7) << "\t"
-        << "|After Id : " << std::left << padStringInt(pk->getafterid(),7) << "\t"
-        << "|Src Addr : " << std::left << padStringInt(pk->getSrcAddr(),7) << "\t"
+        << "|getKind : " << std::left << padStringInt(pk->getKind(),7) << "\t"
+        */
+        << "|getDestAddr: " << std::left << padStringInt(pk->getDestAddr(),7) << "\t"
+        /*
+        << "|getbeforeid : " << std::left << padStringInt(pk->getbeforeid(),7) << "\t"
+        << "|getafterid : " << std::left << padStringInt(pk->getafterid(),7) << "\t"
+        */
+        << "|getSrcAddr : " << std::left << padStringInt(pk->getSrcAddr(),7) << "\t"
+        /*
         << "|getSrcProcId : " << std::left << padStringInt(pk->getSrcProcId(),7) << "\t"
-        << "|SrcNodeRating : " << std::left << padStringInt(pk->getNodeRating(),7) << "\t"
-        << "|SrcgetPrevHash : " << std::left << padStringStr(pk->getPrevHash(),100) << "\t";
-        fulloutput_file << std::endl;
-        //---------------------------------------------------/
+        << "|getGroupCode(Src) : " << std::left << padStringStr(pk->getGroupCode(),7) << "\t"
+        */
+        << "|getNodeRating(Src) : " << std::left << padStringInt(pk->getNodeRating(),7) << "\t"
+        << "|getPrevHash(Src) : " << std::left << padStringStr(pk->getPrevHash(),100) << "\t";
+        fulloutput << std::endl;
+        fulloutput_file << fulloutput.str();
         fulloutput_file.close();
+        //---------------------------------------------------/
+        Write_Content_to_All_Nodes(fulloutput_fileName, 56);
+        //---------------------------------------------------/
         EV << "Dosyaya içerik başarıyla eklendi: " << fulloutput_fileName << endl;
         } else {
           EV << "Dosya açılamadı: " << fulloutput_fileName << endl;
@@ -243,7 +247,7 @@ void App::FileWrite_Points_txt(MyPacket* pk) {
 void App::FileWrite_TotalPoints_txt(MyPacket* pk) {
     std::string PointsTotalfileName = "./datafiles/TotalPoints.txt";
     std::ofstream PointsTotal_file(PointsTotalfileName, std::ios::app);
-
+    // Döngüyü belirli bir süre beklet (örneğin, 1 saniye)
     // std::this_thread::sleep_for(std::chrono::seconds(1));
     struct Data {
         int totalRating = 0;
@@ -262,17 +266,19 @@ void App::FileWrite_TotalPoints_txt(MyPacket* pk) {
        }
        std::unordered_map<int, Data> sourceData;
        std::string line;
+       // Başlık satırını oku ve atla
        std::getline(inputFile, line);
        while (std::getline(inputFile, line)) {
            std::istringstream iss(line);
            int sourceID, destinationID, rating, votes;
            if (!(iss >> sourceID >> destinationID >> rating >> votes)) {
                std::cout << "Veri okunamadı!" << std::endl;
-               continue; 
+               continue; // Hatalı satırı atla
            }
            sourceData[sourceID].totalRating += rating;
            sourceData[sourceID].totalVotes += votes;
        }
+       // Sonuçları TotalPoints.txt dosyasına yaz
        for (const auto& entry : sourceData) {
            outputFile
                << std::setw(8)  << std::right << entry.first << "\t"
@@ -395,6 +401,8 @@ void App::FileWrite_TrustLevel_txt() {
     }
  };
 //----------------------------------
+// Dosyadan verileri okuma
+//----------------------------------
 std::ifstream inputFile("./datafiles/TotalPoints.txt");
 if (!inputFile.is_open()) {
 std::cout << "Dosya bulunamadı!" << endl;
@@ -419,6 +427,7 @@ std::string line;
 
    }
    inputFile.close();
+
 //----------------------------------
 std::sort(records.begin(), records.end(), Record::compareRecords);
 //----------------------------------
@@ -481,19 +490,44 @@ void App::AttackDetectionRatio(MyPacket *pk, int calcProcess, double min_ratio,d
          dosya.close();
          std::cout << "Veriler dosyaya yazıldı.\n";
  }
+void App::Write_Content_to_All_Nodes(const std::string& SourceFile, int NodeCount) {
+    // Öncelikle kaynak dosyadan içeriği oku
+    std::ifstream infile(SourceFile);
+    if (!infile.is_open()) {
+        std::cerr << "Hata: " << SourceFile << " dosyası açılamadı!" << std::endl;
+        return;
+    }
+
+    std::stringstream buffer;
+    buffer << infile.rdbuf();
+    std::string Content = buffer.str();
+    infile.close();
+
+    // İçeriği belirtilen düğüm dosyalarına yaz
+    for (int i = 1; i <= NodeCount; ++i) {
+        std::stringstream filename;
+        filename << "./datafiles/" << "Node" << std::setw(2) << std::setfill('0') << i << ".txt";
+        std::ofstream outfile(filename.str());
+        if (outfile.is_open()) {
+            outfile << Content << std::endl;
+            outfile.close();
+            std::cout << "Node " << i << " dosyası oluşturuldu: " << filename.str() << std::endl;
+        } else {
+            std::cerr << "Hata: " << filename.str() << " dosyası oluşturulamadı!" << std::endl;
+        }
+    }
+}
 //=====================================================================================/
 void App::initialize() {
-    numNodes = 56;//Toplam düğüm sayısı
-    myAddress = par("address");//Uygulamanın bu düğümün adresi
-    packetLengthBytes = &par("packetLength");//Paket uzunluğunu belirleyen parametre
-    sendIATime = &par("sendIaTime");//Paket gönderim aralığını belirleyen parametre
-    pkCounter = 0;//Üretilen paketlerin sayısını tutan sayaç
+    numNodes = 56;
+    myAddress = par("address");
+    packetLengthBytes = &par("packetLength");
+    sendIATime = &par("sendIaTime");
+    pkCounter = 0;
     std::string prevHash = "INITIAL_HASH_VALUE";
     WATCH(pkCounter);
     WATCH(myAddress);
     //----------------------------------------------------------//
-   //Destinasyon Adreslerinin Parçalanması->başla
-    //destAddresses parametresi içinde belirtilen adresler parçalanarak destAddresses vektörüne eklenir. En az bir adres belirtilmemişse, bir hata üretir.
     const char *destAddressesPar = par("destAddresses");
     cStringTokenizer tokenizer(destAddressesPar);
     const char *token;
@@ -501,20 +535,15 @@ void App::initialize() {
           destAddresses.push_back(atoi(token));
     if (destAddresses.size() == 0)
        throw cRuntimeError("At least one address must be specified in the destAddresses parameter!");
-    //Destinasyon Adreslerinin Parçalanması->bitir
     //----------------------------------------------------------//
-    //nextPacket adında yeni bir ileti (cMessage) oluşturulur ve belirlenen gönderim aralığına göre zamanlanır.->başla
     generatePacket = new cMessage("nextPacket");
     scheduleAt(sendIATime->doubleValue(), generatePacket);
     //nextPacket adında yeni bir ileti (cMessage) oluşturulur ve belirlenen gönderim aralığına göre zamanlanır.->bitir
     //----------------------------------------------------------//
-    //Simülasyon sırasında kullanılacak sinyaller (örneğin, gecikme, atlama sayısı, kaynak adresi gibi) kaydedilir.->başla
     endToEndDelaySignal = registerSignal("endToEndDelay");
     hopCountSignal = registerSignal("hopCount");
     sourceAddressSignal = registerSignal("sourceAddress");
-    //Simülasyon sırasında kullanılacak sinyaller (örneğin, gecikme, atlama sayısı, kaynak adresi gibi) kaydedilir.->bitir
     //----------------------------------------------------------//
-    //İlk blok (genesis blok) için bir MyPacket oluşturulur ve gerekli özellikler ayarlanır. Bu paket, blok zincirindeki ilk bloğudur->başla
     MyPacket *genesisPacket = new MyPacket("Genesis Block");
     genesisPacket->setByteLength(packetLengthBytes->intValue());
     genesisPacket->setKind(intuniform(0, 7));
@@ -523,53 +552,38 @@ void App::initialize() {
     genesisPacket->setPrevHash(prevHash);
     Block *genesisBlock = new Block(genesisPacket, prevHash);
     blockchain.push_back(genesisBlock);
-    //İlk blok (genesis blok) için bir MyPacket oluşturulur ve gerekli özellikler ayarlanır. Bu paket, blok zincirindeki ilk bloğudur->bitir
     //----------------------------------------------------------//
-    //Gruplu ağ verilerini işlemek için GroupedNetworkData fonksiyonu çağrılır.->başla
     GroupedNetworkData();
-    //Gruplu ağ verilerini işlemek için GroupedNetworkData fonksiyonu çağrılır.->bitir
     //----------------------------------------------------------//
 }
 //=====================================================================================/
 void App::handleMessage(cMessage *msg) {
-    if (msg == generatePacket) {//Gelen msg değişkeninin generatePacket pointer'ına eşit olup olmadığını kontrol et
+    if (msg == generatePacket) {
         //----------------------------------------------------------//
-        //Rastgele bir hedef adres seçilir (destAddress), ancak bu adres üreteci düğümün adresi (myAddress) veya sabit bir adres (56) ile aynı olamaz.->başla
         int destAddress;
         do {
             destAddress = intuniform(1, numNodes);
         } while (destAddress == myAddress || destAddress == 56);
-        //Rastgele bir hedef adres seçilir (destAddress), ancak bu adres üreteci düğümün adresi (myAddress) veya sabit bir adres (56) ile aynı olamaz.->bitir
         //----------------------------------------------------------//
-        //Paketin adı oluşturulur (pkname), örneğin "pk-5-to-10-#1".->başla
         char pkname[40];
         sprintf(pkname, "pk-%d-to-%d-#%ld", myAddress, destAddress, pkCounter++);
-        //Paketin adı oluşturulur (pkname), örneğin "pk-5-to-10-#1".->bitir
         //----------------------------------------------------------//
         EV << "generating packet " << pkname << endl;
         //----------------------------------------------------------//
-        //MyPacket tipinde yeni bir paket oluşturulur ve paketin özellikleri (byteLength, kind, srcAddr, destAddr) ayarlanır.->başla
         MyPacket *pk = new MyPacket(pkname);
         pk->setByteLength(packetLengthBytes->intValue());
         pk->setKind(intuniform(0, 7));
         pk->setSrcAddr(myAddress);
         pk->setDestAddr(destAddress);
-        //MyPacket tipinde yeni bir paket oluşturulur ve paketin özellikleri (byteLength, kind, srcAddr, destAddr) ayarlanır.->bitir
         //----------------------------------------------------------//
-        //Blok zinciri (blockchain) üzerindeki son bloğun hash değeri ve düğümün puanı (nodeRating) pakete ekle->başla
         pk->setPrevHash(blockchain.back()->getHash());
         pk->setNodeRating(autorateNode(pk));
-        //Blok zinciri (blockchain) üzerindeki son bloğun hash değeri ve düğümün puanı (nodeRating) pakete ekle->bitir
         //----------------------------------------------------------//
-        //Paketin beforid ve afterid değeri atanır->başla
         pk->setbeforeid(myAddress);
         pk->setafterid(destAddress);
-        //Paketin beforid ve afterid değeri atanır->bitir
         //----------------------------------------------------------//
-        //Yeni bir blok oluşturulur ve blok zincirine ekle->başla
         Block *newBlock = new Block(pk, blockchain.back()->getHash());
         blockchain.push_back(newBlock);
-        //Yeni bir blok oluşturulur ve blok zincirine ekle->bitir
         //----------------------------------------------------------//
         //Attack mechanism calling-başla
         //----------------------------------------------------------//
@@ -605,13 +619,14 @@ void App::handleMessage(cMessage *msg) {
         //----------------------------------------------------------//
         scheduleAt(simTime() + sendIATime->doubleValue(), generatePacket);
         //----------------------------------------------------------//
-        if (hasGUI()){//Eğer arayüz varsa, bazı görsel geribildirim işlemleri yapılır.
+        if (hasGUI()){
            //getParentModule()->bubble("Generating packet for blockchain...");
            FilesWritingPacketInformation(pk);
            }
   } else {
             //Gelen msg bir MyPacket tipine dönüştürülür ve işlenir. Bu kısımda paketin adı, atlama sayısı gibi bilgiler kaydedilir ve görsel geribildirim yapılır.-başla
              MyPacket *pk = check_and_cast<MyPacket *>(msg);
+                 //----------------------------------------------------------//
                     EV << "received packet " << pk->getName() << " after " << pk->getHopCount() << "hops" << endl;
                     emit(endToEndDelaySignal, simTime() - pk->getCreationTime());
                     emit(hopCountSignal, pk->getHopCount());
@@ -624,6 +639,7 @@ void App::handleMessage(cMessage *msg) {
                        //****************
                        FilesWritingPacketInformation(pk);
                      }
+                 //----------------------------------------------------------//
               delete pk;
             }
   }
@@ -820,11 +836,11 @@ std::string App::calculateSHA256(const std::string& input) const {
 }
 //=====================================================================================/
 Block::Block(MyPacket* data, const std::string& prevHash) {
-    this->data = data;
-    this->prevHash = prevHash;
-    this->timestamp = time(nullptr);
-    this->hash = calculateHash(App());
- }
+    this->data = data;                   // Gönderilen 'data' parametresini, bu nesnenin 'data' üyesine atar.
+    this->prevHash = prevHash;           // Gönderilen 'prevHash' parametresini, bu nesnenin 'prevHash' üyesine atar.
+    this->timestamp = time(nullptr);     // Şu anki zamanı 'timestamp' üyesine atar.
+    this->hash = calculateHash(App());   // 'calculateHash' fonksiyonunu çağırarak 'hash' üyesine bir değer atar.
+}
 //=====================================================================================/
 std::string Block::calculateHash(const App& app) const {
 
