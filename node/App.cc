@@ -1,7 +1,7 @@
 #ifdef _MSC_VER
 #pragma warning(disable:4786)
 #endif
-//=====================================================================================/
+ //=====================================================================================/
 #include <iomanip>
 #include <vector>
 #include <omnetpp.h>
@@ -69,7 +69,7 @@ public:
 //=====================================================================================/
 class App : public cSimpleModule {
 private:
-    cTextFigure *textFigure1; 
+    cTextFigure *textFigure1;  
     //---------------------------------------------------/
     void FilesWritingPacketInformation(MyPacket* pk);
     void FileWrite_Full_txt(MyPacket* pk);
@@ -86,6 +86,8 @@ private:
     void Nodes_Network_TotalPoints_Xml();
     void GroupedNetworkDataWithGroupTotalsPoints_Xml();
     void All_Network_TotalPoints_Xml();
+    void MergeXmlFiles();
+    void Detection_of_good_and_malicious_nodes();
     //---------------------------------------------------/
     int numNodes;
     int myAddress;
@@ -158,6 +160,8 @@ void App::FilesWritingPacketInformation(MyPacket* pk) {
  Nodes_Network_TotalPoints_Xml();
  GroupedNetworkDataWithGroupTotalsPoints_Xml();
  All_Network_TotalPoints_Xml();
+MergeXmlFiles();
+Detection_of_good_and_malicious_nodes();
  //---------------------------------------------------/
  FileWrite_TrustLevel_txt();
  //---------------------------------------------------/
@@ -247,8 +251,6 @@ void App::FileWrite_Points_txt(MyPacket* pk) {
 void App::FileWrite_TotalPoints_txt(MyPacket* pk) {
     std::string PointsTotalfileName = "./datafiles/TotalPoints.txt";
     std::ofstream PointsTotal_file(PointsTotalfileName, std::ios::app);
-    // Döngüyü belirli bir süre beklet (örneğin, 1 saniye)
-    // std::this_thread::sleep_for(std::chrono::seconds(1));
     struct Data {
         int totalRating = 0;
         int totalVotes = 0;
@@ -266,19 +268,17 @@ void App::FileWrite_TotalPoints_txt(MyPacket* pk) {
        }
        std::unordered_map<int, Data> sourceData;
        std::string line;
-       // Başlık satırını oku ve atla
        std::getline(inputFile, line);
        while (std::getline(inputFile, line)) {
            std::istringstream iss(line);
            int sourceID, destinationID, rating, votes;
            if (!(iss >> sourceID >> destinationID >> rating >> votes)) {
                std::cout << "Veri okunamadı!" << std::endl;
-               continue; // Hatalı satırı atla
+               continue; 
            }
            sourceData[sourceID].totalRating += rating;
            sourceData[sourceID].totalVotes += votes;
        }
-       // Sonuçları TotalPoints.txt dosyasına yaz
        for (const auto& entry : sourceData) {
            outputFile
                << std::setw(8)  << std::right << entry.first << "\t"
@@ -393,15 +393,12 @@ void App::FileWrite_TrustLevel_txt() {
     int Node;
     int Rating;
     int Votes;
-    int Serial_no; // Yeni eklenen sıra numarası
-    double Percent; // Yeni eklenen sütun
-    // Karşılaştırma fonksiyonu
+    int Serial_no; 
+    double Percent; 
     static bool compareRecords(const Record& a, const Record& b) {
     return a.Rating > b.Rating;
     }
  };
-//----------------------------------
-// Dosyadan verileri okuma
 //----------------------------------
 std::ifstream inputFile("./datafiles/TotalPoints.txt");
 if (!inputFile.is_open()) {
@@ -412,7 +409,6 @@ return  ;
 std::vector<Record> records;
 std::string line;
 
-   // Başlık satırını oku ve atla
    std::getline(inputFile, line);
 
    while (std::getline(inputFile, line)) {
@@ -421,13 +417,12 @@ std::string line;
            if (!(iss >> temp.Node >> temp.Rating >> temp.Votes)) {
 
            std::cout << "Veri okunamadı!" << std::endl;
-           continue; // Hatalı satırı atla
+           continue; 
        }
        records.push_back(temp);
 
    }
    inputFile.close();
-
 //----------------------------------
 std::sort(records.begin(), records.end(), Record::compareRecords);
 //----------------------------------
@@ -447,7 +442,6 @@ double quarter = numNodes * 0.25;
            records[i].Percent = 100.0;
        }
    }
-
 //----------------------------------
 std::ofstream outFile("./datafiles/TrustLevel.txt");
 if (!outFile.is_open()) {
@@ -471,13 +465,10 @@ std::cout << "Çıktı Trust_Level dosyasına yazdırıldı !" << std::endl;
 std::cout << "Çıktı Trust_Level dosyasına yazdırılması bitti !" << std::endl;
 outFile.close();
 //----------------------------------
-//End
-//----------------------------------
 }
 void App::AttackDetectionRatio(MyPacket *pk, int calcProcess, double min_ratio,double max_ratio,std::string attackFileName) {
          std::ofstream dosya("./datafiles/"+attackFileName);
          double attack_orani[] = {0.1, 0.2, 0.3, 0.4, 0.5};
-         //double detection_orani[] = {0.1, 0.2, 0.3, 0.4, 0.5};
          srand(time(0));
          dosya << "Percent\tAttack\tDetection\tRatio\n";
           for (int i = 0; i < 5; ++i) {
@@ -491,7 +482,6 @@ void App::AttackDetectionRatio(MyPacket *pk, int calcProcess, double min_ratio,d
          std::cout << "Veriler dosyaya yazıldı.\n";
  }
 void App::Write_Content_to_All_Nodes(const std::string& SourceFile, int NodeCount) {
-    // Öncelikle kaynak dosyadan içeriği oku
     std::ifstream infile(SourceFile);
     if (!infile.is_open()) {
         std::cerr << "Hata: " << SourceFile << " dosyası açılamadı!" << std::endl;
@@ -502,8 +492,6 @@ void App::Write_Content_to_All_Nodes(const std::string& SourceFile, int NodeCoun
     buffer << infile.rdbuf();
     std::string Content = buffer.str();
     infile.close();
-
-    // İçeriği belirtilen düğüm dosyalarına yaz
     for (int i = 1; i <= NodeCount; ++i) {
         std::stringstream filename;
         filename << "./datafiles/" << "Node" << std::setw(2) << std::setfill('0') << i << ".txt";
@@ -538,7 +526,6 @@ void App::initialize() {
     //----------------------------------------------------------//
     generatePacket = new cMessage("nextPacket");
     scheduleAt(sendIATime->doubleValue(), generatePacket);
-    //nextPacket adında yeni bir ileti (cMessage) oluşturulur ve belirlenen gönderim aralığına göre zamanlanır.->bitir
     //----------------------------------------------------------//
     endToEndDelaySignal = registerSignal("endToEndDelay");
     hopCountSignal = registerSignal("hopCount");
@@ -615,16 +602,12 @@ void App::handleMessage(cMessage *msg) {
             pk->setGroupCode("A0");
         }
         //----------------------------------------------------------//
-        //Attack mechanism calling-bitir
-        //----------------------------------------------------------//
         scheduleAt(simTime() + sendIATime->doubleValue(), generatePacket);
         //----------------------------------------------------------//
         if (hasGUI()){
-           //getParentModule()->bubble("Generating packet for blockchain...");
            FilesWritingPacketInformation(pk);
            }
   } else {
-            //Gelen msg bir MyPacket tipine dönüştürülür ve işlenir. Bu kısımda paketin adı, atlama sayısı gibi bilgiler kaydedilir ve görsel geribildirim yapılır.-başla
              MyPacket *pk = check_and_cast<MyPacket *>(msg);
                  //----------------------------------------------------------//
                     EV << "received packet " << pk->getName() << " after " << pk->getHopCount() << "hops" << endl;
@@ -633,10 +616,8 @@ void App::handleMessage(cMessage *msg) {
                     emit(sourceAddressSignal, pk->getSrcAddr());
                     if (hasGUI()){
                        getParentModule()->bubble("Arrived!");
-                       //****************
                        nodechangeColor(1,10,pk);
                        technical_information(pk);
-                       //****************
                        FilesWritingPacketInformation(pk);
                      }
                  //----------------------------------------------------------//
@@ -700,9 +681,7 @@ bool App::bir_grup_kotucul_nodun_bayrak_yarisi_sistemi_ile_bir_grup_noda_saldiri
 }
 //=====================================================================================/
 int App::autorateNode(const MyPacket* packet) {
-    //int min = -100;
     int min = 0;
-    //int max = 100;
     int max = 10;
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -745,49 +724,36 @@ void App::nodechangeColor(int minNodeId, int maxNodId, MyPacket* pk) {
     int criteriaId=pk->getDestAddr();
     cDisplayString& displayString = getDisplayString();
     if (criteriaId >= minNodeId && criteriaId <= maxNodId ) {
-        //displayString.parse("b=oval,red");  // Düğüm kırmızı
-        displayString.parse("i=misc/node_vs,red");  // Düğüm kırmızı
+        displayString.parse("i=misc/node_vs,red");  
     } else {
-        //displayString.parse("b=oval,blue");  // Düğüm mavi
-        displayString.parse("i=misc/node_vs,blue");  // Düğüm mavi
+        displayString.parse("i=misc/node_vs,blue"); 
     }
     getParentModule()->setDisplayString(displayString);
     refreshDisplay();
 }
 //=====================================================================================/
 void App::technical_information(MyPacket* pk) {
-    //---------------------------------------------------/
-    // cTextFigure oluştur
     textFigure1 = new cTextFigure("nodeIdText");
-    //Fontu oluştur ve ayarla
     omnetpp::cFigure::Font font("Courier",20);
-    textFigure1->setFont(font); // Yazı tipini ayarla
+    textFigure1->setFont(font); 
     EV << "Set font\n";
-    textFigure1->setPosition(cFigure::Point(100, 100)); // Pozisyonu ayarla
-    textFigure1->setColor(cFigure::BLACK); // Renk ayarla
-    textFigure1->setVisible(true); // Görünürlüğü ayarla
+    textFigure1->setPosition(cFigure::Point(100, 100)); 
+    textFigure1->setColor(cFigure::BLACK); 
+    textFigure1->setVisible(true);
     EV << "Configured text figure\n";
-    //cFigure *statusFigure1 =getCanvas()->getRootFigure()->getFigure("status");
-    //statusFigure1->getFigure("heading");
     EV << "Added text figure to canvas\n";
-    //Başlangıç metnini ayarla
-    //textFigure1->setText("Arda Test Value");
     EV << "Set text for text figure\n";
-    //---------------------------------------------------/
     cCanvas *canvas = getParentModule()->getCanvas();
     if (!canvas) {
         EV << "Error: Canvas not found." << endl;
-        //return;
     }
     cFigure *rootFigure = canvas->getRootFigure();
     if (!rootFigure) {
         EV << "Error: Root figure not found." << endl;
-       // return;
     }
     cFigure *statusFigure = rootFigure->getFigure("status");
     if (!statusFigure) {
         EV << "Error: Status figure not found." << endl;
-        //return;
     }
     cGroupFigure *statusGroup = dynamic_cast<cGroupFigure*>(statusFigure);
     if (!statusGroup) {
@@ -805,9 +771,7 @@ void App::technical_information(MyPacket* pk) {
         return;
     }
     headingText->setText("998");
-    // Ekranı yeniliyoruz
     headingFigure->refreshDisplay();
-   // statusGroup->refreshDisplay();
     rootFigure->refreshDisplay();
 }
 //=====================================================================================/
@@ -836,10 +800,10 @@ std::string App::calculateSHA256(const std::string& input) const {
 }
 //=====================================================================================/
 Block::Block(MyPacket* data, const std::string& prevHash) {
-    this->data = data;                   // Gönderilen 'data' parametresini, bu nesnenin 'data' üyesine atar.
-    this->prevHash = prevHash;           // Gönderilen 'prevHash' parametresini, bu nesnenin 'prevHash' üyesine atar.
-    this->timestamp = time(nullptr);     // Şu anki zamanı 'timestamp' üyesine atar.
-    this->hash = calculateHash(App());   // 'calculateHash' fonksiyonunu çağırarak 'hash' üyesine bir değer atar.
+    this->data = data;                  
+    this->prevHash = prevHash;           
+    this->timestamp = time(nullptr);     
+    this->hash = calculateHash(App());   
 }
 //=====================================================================================/
 std::string Block::calculateHash(const App& app) const {
@@ -854,9 +818,7 @@ std::string Block::calculateHash(const App& app) const {
 void App::GroupedNetworkData() {
     const char *inputFile = "./networks/connections.txt";
     const char *outputFile = "./datafiles/Grouped_Networks.txt";
-    // Gruplanmış veriyi tutacak map yapısı
     map<string, vector<vector<string>>> groupedData;
-    // Girdi dosyasından veriyi okuyup src ve dest'e göre grupla
     ifstream file(inputFile);
     if (!file.is_open()) {
         EV << "Dosya açma hatası: " << inputFile << endl;
@@ -879,17 +841,16 @@ void App::GroupedNetworkData() {
         string delay = tokens[2];
         string error = tokens[3];
         string datarate = tokens[4];
-        // Gruplanmış veriye ekleme
+
         groupedData[src].push_back({src, dest, delay, error, datarate});
+
     }
     file.close();
-    // Düz metin dosyasına gruplanmış veriyi yazma
     ofstream outFile(outputFile);
     if (!outFile.is_open()) {
         EV << "Çıktı dosyası açma hatası: " << outputFile << endl;
         return;
     }
-    // Başlık satırını yaz
     outFile << std::setw(12) << std::left << "Source_ID"
             << std::setw(15) << std::left << "Destination_ID"
             << std::setw(10) << std::left << "Delay"
@@ -899,13 +860,13 @@ void App::GroupedNetworkData() {
     int groupNumber = 1;
     for (const auto& entry : groupedData) {
         for (const auto& data : entry.second) {
-            outFile << std::setw(12) << std::left << data[0]
+             outFile << std::setw(12) << std::left << data[0]
                     << std::setw(15) << std::left << data[1]
                     << std::setw(10) << std::left << std::fixed << data[2]
                     << std::setw(10) << std::left << std::fixed << data[3]
                     << std::setw(10) << std::left << std::fixed << data[4]
                     << std::setw(7) << std::left << std::fixed << groupNumber << std::endl;
-               }
+                }
         groupNumber++;
     }
     outFile.close();
@@ -928,11 +889,9 @@ void App::Grouped_Network_TotalPoints_Xml() {
         std::map<std::string, std::vector<NetworkData>> groupedData;
         std::map<std::string, int> destinationTotalVotes;
         std::map<std::string, int> destinationTotalRating;
-        // XML dosyasını temizle veya yeniden oluştur
            tinyxml2::XMLDocument doc;
            tinyxml2::XMLNode* pRoot = doc.NewElement("NetworkData");
            doc.InsertFirstChild(pRoot);
-        // TotalPoints.txt dosyasını oku ve destinationTotalVotes ve destinationTotalRating haritalarına ekle
         std::ifstream totalPoints(totalPointsFile);
         if (!totalPoints.is_open()) {
             std::cerr << "TotalPoints.txt dosyası açılamadı." << std::endl;
@@ -950,7 +909,6 @@ void App::Grouped_Network_TotalPoints_Xml() {
             }
         }
         totalPoints.close();
-        // Grouped_Network.txt dosyasını oku ve gruplanmış verileri groupedData haritasına ekle
         std::ifstream groupedNetwork(inputFile);
         if (!groupedNetwork.is_open()) {
             std::cerr << "Grouped_Network.txt dosyası açılamadı." << std::endl;
@@ -967,13 +925,11 @@ void App::Grouped_Network_TotalPoints_Xml() {
         groupedNetwork.close();
         for (const auto& group : groupedData) {
             for (const auto& data : group.second) {
-                // TotalPoints.txt dosyasındaki Total_Rating değerini bul
                 auto xit = destinationTotalRating.find(data.dest);
                 int totalRating = (xit != destinationTotalRating.end()) ? xit->second : 0;
-                // TotalPoints.txt dosyasındaki Total_Votes değerini bul
                 auto yit = destinationTotalVotes.find(data.dest);
                 int totalVotes = (yit != destinationTotalVotes.end()) ? yit->second : 0;
-                double average = (totalVotes != 0) ? static_cast<double>(totalRating) / totalVotes : 0.0;
+                double average = (totalVotes != 0) ? static_cast<double>(totalVotes) / totalRating  : 0.0;
                 tinyxml2::XMLElement* pElement = doc.NewElement("Network");
                 pElement->SetAttribute("Source_ID", data.src.c_str());
                 pElement->SetAttribute("Destination_ID", data.dest.c_str());
@@ -981,8 +937,8 @@ void App::Grouped_Network_TotalPoints_Xml() {
                 pElement->SetAttribute("Error", data.error.c_str());
                 pElement->SetAttribute("Rate", data.rate.c_str());
                 pElement->SetAttribute("Group", data.group.c_str());
-                pElement->SetAttribute("Total_Votes", totalVotes);
-                pElement->SetAttribute("Total_Rating", totalRating);
+                pElement->SetAttribute("Total_Votes", totalRating);
+                pElement->SetAttribute("Total_Rating", totalVotes);
                 pElement->SetAttribute("Average", average);
                 pRoot->InsertEndChild(pElement);
                 std::cerr << ">>>>>>>>>>>>>>>>>>>>>>>>> Grouped_Network_TotalPoints.txt dosyası yazılıyor - 2." << std::endl;
@@ -1003,11 +959,9 @@ void App::Nodes_Network_TotalPoints_Xml() {
     const std::string outputFile = "./datafiles/Nodes_Network_TotalPoints.xml";
     std::map<std::string, int> sourceTotalVotes;
     std::map<std::string, int> sourceTotalRating;
-    // XML dosyasını temizle veya yeniden oluştur
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLNode* pRoot = doc.NewElement("NetworkData");
     doc.InsertFirstChild(pRoot);
-    // TotalPoints.txt dosyasını oku ve sourceTotalVotes ve sourceTotalRating haritalarına ekle
     std::ifstream totalPoints(totalPointsFile);
     if (!totalPoints.is_open()) {
         std::cerr << "TotalPoints.txt dosyası açılamadı." << std::endl;
@@ -1018,6 +972,7 @@ void App::Nodes_Network_TotalPoints_Xml() {
         std::istringstream iss(totalPointsLine);
         std::string sourceID;
         int totalVotes, totalRating;
+
         if (iss >> sourceID >> totalVotes >> totalRating) {
             sourceTotalVotes[sourceID] = totalVotes;
             sourceTotalRating[sourceID] = totalRating;
@@ -1025,7 +980,6 @@ void App::Nodes_Network_TotalPoints_Xml() {
         }
     }
     totalPoints.close();
-    // Grouped_Network.txt dosyasını oku ve Source_ID'ye göre verileri grupla
     std::ifstream groupedNetwork(inputFile);
     if (!groupedNetwork.is_open()) {
         std::cerr << "Grouped_Network.txt dosyası açılamadı." << std::endl;
@@ -1041,24 +995,22 @@ void App::Nodes_Network_TotalPoints_Xml() {
         }
     }
     groupedNetwork.close();
-    // Source_ID'ye göre toplam ve ortalama değerleri hesapla ve XML dosyasına yaz
     for (const auto& group : groupedData) {
         const std::string& sourceID = group.first;
         int totalVotes = 0;
         int totalRating = 0;
         for (const auto& data : group.second) {
-            // Toplam Rating ve Votes değerlerini Source_ID'ye göre topla
-            totalVotes += sourceTotalVotes[data.src];
-            totalRating += sourceTotalRating[data.src];
-        }
-        double average = (totalVotes != 0) ? static_cast<double>(totalRating) / totalVotes : 0.0;
-        tinyxml2::XMLElement* pElement = doc.NewElement("Network");
-        pElement->SetAttribute("Source_ID", sourceID.c_str());
-        pElement->SetAttribute("Total_Votes", totalVotes);
-        pElement->SetAttribute("Total_Rating", totalRating);
-        pElement->SetAttribute("Average", average);
-        pRoot->InsertEndChild(pElement);
-        std::cerr << ">>>>>>>>>>>>>>>>>>>>>>>>> Grouped_Network_TotalPoints.txt dosyası yazılıyor - 2." << std::endl;
+            totalVotes = sourceTotalVotes[data.src];
+            totalRating = sourceTotalRating[data.src];
+            }
+            double average = (totalRating != 0) ? static_cast<double>(totalVotes) / totalRating  : 0.0;
+            tinyxml2::XMLElement* pElement = doc.NewElement("Network");
+            pElement->SetAttribute("Destination_ID", sourceID.c_str());
+            pElement->SetAttribute("Total_Votes", totalRating);
+            pElement->SetAttribute("Total_Rating", totalVotes);
+            pElement->SetAttribute("Average", average);
+            pRoot->InsertEndChild(pElement);
+            std::cerr << ">>>>>>>>>>>>>>>>>>>>>>>>> Grouped_Network_TotalPoints.txt dosyası yazılıyor - 2." << std::endl;
     }
     tinyxml2::XMLError eResult = doc.SaveFile(outputFile.c_str());
     if (eResult != tinyxml2::XML_SUCCESS) {
@@ -1075,7 +1027,6 @@ void App::GroupedNetworkDataWithGroupTotalsPoints_Xml() {
     std::map<std::string, std::vector<NetworkData>> groupedData;
     std::map<std::string, int> destinationTotalVotes;
     std::map<std::string, int> destinationTotalRating;
-    // TotalPoints.txt dosyasını oku ve destinationTotalVotes ve destinationTotalRating haritalarına ekle
     std::ifstream totalPoints(totalPointsFile);
     if (!totalPoints.is_open()) {
         std::cerr << "TotalPoints.txt dosyası açılamadı." << std::endl;
@@ -1092,7 +1043,6 @@ void App::GroupedNetworkDataWithGroupTotalsPoints_Xml() {
         }
     }
     totalPoints.close();
-    // Grouped_Network.txt dosyasını oku ve gruplanmış verileri groupedData haritasına ekle
     std::ifstream groupedNetwork(inputFile);
     if (!groupedNetwork.is_open()) {
         std::cerr << "Grouped_Network.txt dosyası açılamadı." << std::endl;
@@ -1107,7 +1057,6 @@ void App::GroupedNetworkDataWithGroupTotalsPoints_Xml() {
         }
     }
     groupedNetwork.close();
-    // Gruplara göre toplamları hesapla
     std::map<std::string, int> groupTotalRating;
     std::map<std::string, int> groupTotalVotes;
     for (const auto& group : groupedData) {
@@ -1122,7 +1071,6 @@ void App::GroupedNetworkDataWithGroupTotalsPoints_Xml() {
             groupTotalVotes[group.first] += totalVotes;
         }
     }
-    // Gruplara göre toplam ve ortalama değerleri XML dosyasına yaz
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLNode* pRoot = doc.NewElement("NetworkGroups");
     doc.InsertFirstChild(pRoot);
@@ -1130,11 +1078,11 @@ void App::GroupedNetworkDataWithGroupTotalsPoints_Xml() {
         std::string groupName = group.first;
         int totalRating = group.second;
         int totalVotes = groupTotalVotes[groupName];
-        double average = (totalVotes != 0) ? static_cast<double>(totalRating) / totalVotes : 0.0;
+        double average = (totalVotes != 0) ? static_cast<double>(totalVotes) / totalRating : 0.0;
         tinyxml2::XMLElement* pElement = doc.NewElement("Group");
         pElement->SetAttribute("Group_Name", groupName.c_str());
-        pElement->SetAttribute("Group_Total_Rating", totalRating);
-        pElement->SetAttribute("Group_Total_Votes", totalVotes);
+        pElement->SetAttribute("Group_Total_Rating", totalVotes);
+        pElement->SetAttribute("Group_Total_Votes", totalRating);
         pElement->SetAttribute("Group_Average", average);
         pRoot->InsertEndChild(pElement);
     }
@@ -1145,56 +1093,159 @@ void App::GroupedNetworkDataWithGroupTotalsPoints_Xml() {
     }
     std::cout << "İşlem tamamlandı. Sonuçlar Grouped_Network_GrupTotalValues.xml dosyasına yazıldı." << std::endl;
 }
-//=====================================================================================/
 void App::All_Network_TotalPoints_Xml() {
-    const std::string inputFile = "./datafiles/Grouped_Networks.txt";
-    const std::string totalPointsFile = "./datafiles/TotalPoints.txt";
+    const std::string inputFile = "./datafiles/Nodes_Network_TotalPoints.xml";
     const std::string outputFile = "./datafiles/All_Network_TotalPoints.xml";
-    std::map<std::string, int> sourceTotalVotes;
-    std::map<std::string, int> sourceTotalRating;
-    // XML dosyasını temizle veya yeniden oluştur
+
     tinyxml2::XMLDocument doc;
-    tinyxml2::XMLNode* pRoot = doc.NewElement("NetworkData");
-    doc.InsertFirstChild(pRoot);
-    // TotalPoints.txt dosyasını oku ve sourceTotalVotes ve sourceTotalRating haritalarına ekle
-    std::ifstream totalPoints(totalPointsFile);
-    if (!totalPoints.is_open()) {
-        std::cerr << "TotalPoints.txt dosyası açılamadı." << std::endl;
+    if (doc.LoadFile(inputFile.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "XML dosyası açılamadı: " << inputFile << std::endl;
         return;
     }
-    std::string totalPointsLine;
-    while (std::getline(totalPoints, totalPointsLine)) {
-        std::istringstream iss(totalPointsLine);
-        std::string sourceID;
-        int totalVotes, totalRating;
-        if (iss >> sourceID >> totalVotes >> totalRating) {
-            sourceTotalVotes[sourceID] = totalVotes;
-            sourceTotalRating[sourceID] = totalRating;
-        }
+
+    tinyxml2::XMLElement* pRoot = doc.FirstChildElement("NetworkData");
+    if (pRoot == nullptr) {
+        std::cerr << "Kök eleman bulunamadı." << std::endl;
+        return;
     }
-    totalPoints.close();
-    // Tüm nodların toplam ve ortalama değerlerini hesapla
-    int allTotalVotes = 0;
-    int allTotalRating = 0;
-    for (const auto& entry : sourceTotalVotes) {
-        allTotalVotes += entry.second;
+
+    int totalRatingSum = 0;
+    int totalVotesSum = 0;
+
+    for (tinyxml2::XMLElement* pElement = pRoot->FirstChildElement("Network"); pElement != nullptr; pElement = pElement->NextSiblingElement("Network")) {
+        int totalRating = 0;
+        int totalVotes = 0;
+        pElement->QueryIntAttribute("Total_Rating", &totalRating);
+        pElement->QueryIntAttribute("Total_Votes", &totalVotes);
+        totalRatingSum += totalRating;
+        totalVotesSum += totalVotes;
     }
-    for (const auto& entry : sourceTotalRating) {
-        allTotalRating += entry.second;
-    }
-    double average = (allTotalVotes != 0) ? static_cast<double>(allTotalRating) / allTotalVotes : 0.0;
-    // XML dosyasına yaz
-    tinyxml2::XMLElement* pElement = doc.NewElement("Network");
-    pElement->SetAttribute("Source_ID", "ALL_NODES");
-    pElement->SetAttribute("Total_Votes", allTotalVotes);
-    pElement->SetAttribute("Total_Rating", allTotalRating);
-    pElement->SetAttribute("Average", average);
-    pRoot->InsertEndChild(pElement);
-    tinyxml2::XMLError eResult = doc.SaveFile(outputFile.c_str());
+
+    double average = (totalVotesSum != 0) ? static_cast<double>(totalRatingSum) / totalVotesSum : 0.0;
+
+    tinyxml2::XMLDocument newDoc;
+    tinyxml2::XMLNode* pNewRoot = newDoc.NewElement("AllTotalPoints");
+    newDoc.InsertFirstChild(pNewRoot);
+
+    tinyxml2::XMLElement* pTotalElement = newDoc.NewElement("Total");
+    pTotalElement->SetAttribute("Total_Rating", totalRatingSum);
+    pTotalElement->SetAttribute("Total_Votes", totalVotesSum);
+    pTotalElement->SetAttribute("Average", average);
+    pNewRoot->InsertEndChild(pTotalElement);
+
+    tinyxml2::XMLError eResult = newDoc.SaveFile(outputFile.c_str());
     if (eResult != tinyxml2::XML_SUCCESS) {
-        std::cerr << "XML dosyası yazılamadı." << std::endl;
+        std::cerr << "XML dosyası yazılamadı: " << outputFile << std::endl;
         return;
     }
+
     std::cout << "İşlem tamamlandı. Sonuçlar All_Network_TotalPoints.xml dosyasına yazıldı." << std::endl;
 }
+//=====================================================================================/
+void App::MergeXmlFiles() {
+    const std::string inputFile1 = "./datafiles/Grouped_Network_TotalPoints.xml";
+    const std::string inputFile2 = "./datafiles/GroupedNetworkDataWithGroupTotalsPoints.xml";
+    const std::string inputFile3 = "./datafiles/All_Network_TotalPoints.xml";
+    const std::string outputFile = "./datafiles/MergedNetworkData.xml";
+
+    tinyxml2::XMLDocument doc1;
+    if (doc1.LoadFile(inputFile1.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "Grouped_Network_TotalPoints.xml dosyası açılamadı." << std::endl;
+        return;
+    }
+
+    tinyxml2::XMLDocument doc2;
+    if (doc2.LoadFile(inputFile2.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "GroupedNetworkDataWithGroupTotalsPoints.xml dosyası açılamadı." << std::endl;
+        return;
+    }
+
+    tinyxml2::XMLDocument doc3;
+    if (doc3.LoadFile(inputFile3.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "All_Network_TotalPoints.xml dosyası açılamadı." << std::endl;
+        return;
+    }
+
+    tinyxml2::XMLElement* totalElement = doc3.FirstChildElement("AllTotalPoints")->FirstChildElement("Total");
+    if (totalElement == nullptr) {
+        std::cerr << "Total eleman bulunamadı." << std::endl;
+        return;
+    }
+    int allTotalRating = totalElement->IntAttribute("Total_Rating");
+    int allTotalVotes = totalElement->IntAttribute("Total_Votes");
+    double allAverage = totalElement->DoubleAttribute("Average");
+
+    std::map<std::string, std::tuple<int, int, double>> groupData;
+    tinyxml2::XMLElement* groupElement = doc2.FirstChildElement("NetworkGroups")->FirstChildElement("Group");
+    while (groupElement != nullptr) {
+        std::string groupName = groupElement->Attribute("Group_Name");
+        int groupTotalRating = groupElement->IntAttribute("Group_Total_Rating");
+        int groupTotalVotes = groupElement->IntAttribute("Group_Total_Votes");
+        double groupAverage = groupElement->DoubleAttribute("Group_Average");
+        groupData[groupName] = std::make_tuple(groupTotalRating, groupTotalVotes, groupAverage);
+        groupElement = groupElement->NextSiblingElement("Group");
+    }
+
+    tinyxml2::XMLElement* networkElement = doc1.FirstChildElement("NetworkData")->FirstChildElement("Network");
+    while (networkElement != nullptr) {
+        std::string group = networkElement->Attribute("Group");
+        if (groupData.find(group) != groupData.end()) {
+            auto [groupTotalRating, groupTotalVotes, groupAverage] = groupData[group];
+            networkElement->SetAttribute("Group_Total_Rating", groupTotalRating);
+            networkElement->SetAttribute("Group_Total_Votes", groupTotalVotes);
+            networkElement->SetAttribute("Group_Average", groupAverage);
+        }
+        networkElement->SetAttribute("All_Total_Rating", allTotalRating);
+        networkElement->SetAttribute("All_Total_Votes", allTotalVotes);
+        networkElement->SetAttribute("All_Average", allAverage);
+
+        networkElement = networkElement->NextSiblingElement("Network");
+    }
+
+    if (doc1.SaveFile(outputFile.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "Yeni XML dosyası yazılamadı." << std::endl;
+        return;
+    }
+
+    std::cout << "İşlem tamamlandı. Sonuçlar MergedNetworkData.xml dosyasına yazıldı." << std::endl;
+}
+//=====================================================================================/
+void App::Detection_of_good_and_malicious_nodes() {
+    const std::string& inputFile="./datafiles/MergedNetworkData.xml";
+    const std::string& outputFile="./datafiles/MergedNetworkData_with_Status.xml";
+
+    tinyxml2::XMLDocument doc;
+    if (doc.LoadFile(inputFile.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "MergedNetworkData.xml dosyası açılamadı." << std::endl;
+        return;
+    }
+
+    tinyxml2::XMLElement* networkElement = doc.FirstChildElement("NetworkData")->FirstChildElement("Network");
+    while (networkElement != nullptr) {
+        double average = networkElement->DoubleAttribute("Average");
+        double groupAverage = networkElement->DoubleAttribute("Group_Average");
+        double allAverage = networkElement->DoubleAttribute("All_Average");
+
+        std::string status;
+        if (average < groupAverage) {
+            status = "-1";
+        } else if (average >= groupAverage && average < allAverage) {
+            status = "0";
+        } else {
+            status = "1";
+        }
+
+        networkElement->SetAttribute("Status", status.c_str());
+
+        networkElement = networkElement->NextSiblingElement("Network");
+    }
+
+    if (doc.SaveFile(outputFile.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "Yeni XML dosyası yazılamadı." << std::endl;
+        return;
+    }
+
+    std::cout << "İşlem tamamlandı. Status sütunu MergedNetworkData.xml dosyasına eklendi." << std::endl;
+}
+//=====================================================================================/
 //=====================================================================================/
